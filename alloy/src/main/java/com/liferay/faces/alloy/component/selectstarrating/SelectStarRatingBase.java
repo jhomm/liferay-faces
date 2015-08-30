@@ -15,21 +15,20 @@ package com.liferay.faces.alloy.component.selectstarrating;
 //J-
 
 import javax.annotation.Generated;
-import com.liferay.faces.alloy.component.selectoneradio.SelectOneRadio;
+import com.liferay.faces.alloy.component.selectrating.SelectRating;
 
 import com.liferay.faces.util.component.Styleable;
-import com.liferay.faces.util.component.ClientComponent;
 
 /**
  * @author	Bruno Basto
  * @author	Kyle Stiemann
  */
 @Generated(value = "com.liferay.alloy.tools.builder.FacesBuilder")
-public abstract class SelectStarRatingBase extends SelectOneRadio implements Styleable, ClientComponent {
+public abstract class SelectStarRatingBase extends SelectRating implements Styleable {
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.selectstarrating.SelectStarRating";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectstarrating.internal.SelectStarRatingRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectstarrating.SelectStarRatingRenderer";
 
 	// Protected Enumerations
 	protected enum SelectStarRatingPropertyKeys {

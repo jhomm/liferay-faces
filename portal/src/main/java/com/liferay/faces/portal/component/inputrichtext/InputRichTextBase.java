@@ -27,7 +27,7 @@ public abstract class InputRichTextBase extends UIInput implements Styleable {
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.portal.component.inputrichtext.InputRichText";
-	public static final String RENDERER_TYPE = "com.liferay.faces.portal.component.inputrichtext.internal.InputRichTextRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.portal.component.inputrichtext.InputRichTextRenderer";
 
 	// Protected Enumerations
 	protected enum InputRichTextPropertyKeys {
@@ -88,7 +88,19 @@ public abstract class InputRichTextBase extends UIInput implements Styleable {
 	}
 
 	public String getLabel() {
-		return (String) getStateHelper().eval(InputRichTextPropertyKeys.label, null);
+
+		String label = (String) getStateHelper().eval(InputRichTextPropertyKeys.label, null);
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
 	}
 
 	public void setLabel(String label) {
@@ -176,7 +188,7 @@ public abstract class InputRichTextBase extends UIInput implements Styleable {
 	}
 
 	public String getToolbarSet() {
-		return (String) getStateHelper().eval(InputRichTextPropertyKeys.toolbarSet, "liferay");
+		return (String) getStateHelper().eval(InputRichTextPropertyKeys.toolbarSet, null);
 	}
 
 	public void setToolbarSet(String toolbarSet) {

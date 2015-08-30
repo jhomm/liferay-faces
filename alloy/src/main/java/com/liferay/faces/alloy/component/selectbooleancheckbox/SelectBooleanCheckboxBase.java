@@ -28,7 +28,7 @@ public abstract class SelectBooleanCheckboxBase extends HtmlSelectBooleanCheckbo
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.selectbooleancheckbox.SelectBooleanCheckbox";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectbooleancheckbox.internal.SelectBooleanCheckboxRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectbooleancheckbox.SelectBooleanCheckboxRenderer";
 
 	// Protected Enumerations
 	protected enum SelectBooleanCheckboxPropertyKeys {
@@ -41,12 +41,29 @@ public abstract class SelectBooleanCheckboxBase extends HtmlSelectBooleanCheckbo
 	}
 
 	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
+	}
+
+	@Override
 	public String getStyleClass() {
 		// getStateHelper().eval(SelectBooleanCheckboxPropertyKeys.styleClass, null) is called because super.getStyleClass() may return the
 		// STYLE_CLASS_NAME of the super class.
 		String styleClass = (String) getStateHelper().eval(SelectBooleanCheckboxPropertyKeys.styleClass, null);
 
-		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-select-boolean-checkbox");
+		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-select-boolean-checkbox", "checkbox");
 	}
 
 	@Override

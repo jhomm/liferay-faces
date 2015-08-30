@@ -34,14 +34,9 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 
 import com.liferay.faces.alloy.component.autocomplete.AutoComplete;
-import com.liferay.faces.util.client.ClientScript;
-import com.liferay.faces.util.client.ClientScriptFactory;
+import com.liferay.faces.alloy.render.internal.JavaScriptFragment;
 import com.liferay.faces.util.component.ClientComponent;
-import com.liferay.faces.util.component.ComponentUtil;
 import com.liferay.faces.util.component.Styleable;
-import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.js.JavaScriptFragment;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.render.RendererUtil;
 import com.liferay.faces.util.render.internal.BufferedScriptResponseWriter;
 
@@ -53,6 +48,7 @@ import com.liferay.faces.util.render.internal.BufferedScriptResponseWriter;
 @FacesRenderer(componentFamily = AutoComplete.COMPONENT_FAMILY, rendererType = AutoComplete.RENDERER_TYPE)
 @ResourceDependencies(
 	{
+		@ResourceDependency(library = "javax.faces", name = "jsf.js"),
 		@ResourceDependency(library = "liferay-faces-alloy", name = "alloy.js"),
 		@ResourceDependency(library = "liferay-faces-reslib", name = "build/aui-css/css/bootstrap.min.css"),
 		@ResourceDependency(library = "liferay-faces-reslib", name = "build/aui/aui-min.js"),
@@ -84,7 +80,7 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 
 			ResponseWriter responseWriter = facesContext.getResponseWriter();
 			ClientComponent clientComponent = (ClientComponent) uiComponent;
-			String clientVarName = ComponentUtil.getClientVarName(facesContext, clientComponent);
+			String clientVarName = getClientVarName(facesContext, clientComponent);
 			String clientKey = clientComponent.getClientKey();
 
 			if (clientKey == null) {
@@ -125,11 +121,11 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 
 			// Start the encoding of the outermost <div> element.
 			ResponseWriter responseWriter = facesContext.getResponseWriter();
-			responseWriter.startElement(StringPool.DIV, uiComponent);
+			responseWriter.startElement("div", uiComponent);
 
 			// Encode the "id" attribute on the outermost <div> element.
 			String clientId = uiComponent.getClientId(facesContext);
-			responseWriter.writeAttribute(StringPool.ID, clientId, StringPool.ID);
+			responseWriter.writeAttribute("id", clientId, "id");
 
 			// Encode the "class" and "style" attributes on the outermost <div> element.
 			Styleable styleable = (Styleable) uiComponent;
@@ -137,25 +133,25 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 
 			// Encode the text input by delegating to the renderer from the JSF runtime.
 			AutoCompleteInputResponseWriter autoCompleteInputResponseWriter = new AutoCompleteInputResponseWriter(
-					responseWriter, StringPool.INPUT, clientId + INPUT_SUFFIX);
+					responseWriter, "input", clientId + INPUT_SUFFIX);
 			super.encodeAll(facesContext, uiComponent, autoCompleteInputResponseWriter);
 
 			// Encode the contentBox of the autoComplete.
-			responseWriter.startElement(StringPool.DIV, uiComponent);
-			responseWriter.writeAttribute(StringPool.ID, clientId + CONTENT_BOX_SUFFIX, null);
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.startElement("div", uiComponent);
+			responseWriter.writeAttribute("id", clientId + CONTENT_BOX_SUFFIX, null);
+			responseWriter.endElement("div");
 
 			// If the developer has specified a server-side filtering, then render the hidden input which is used to
 			// submit the query for server-side filtering.
 			if (isServerFilteringEnabled(uiComponent)) {
 
 				// Encode the hidden input which will be used to submit the query to the server.
-				responseWriter.startElement(StringPool.INPUT, uiComponent);
-				responseWriter.writeAttribute(StringPool.ID, clientId + HIDDEN_SUFFIX, null);
-				responseWriter.writeAttribute(StringPool.NAME, clientId + HIDDEN_SUFFIX, null);
-				responseWriter.writeAttribute(StringPool.TYPE, StringPool.HIDDEN, null);
-				responseWriter.writeAttribute(StringPool.VALUE, StringPool.BLANK, null);
-				responseWriter.endElement(StringPool.INPUT);
+				responseWriter.startElement("input", uiComponent);
+				responseWriter.writeAttribute("id", clientId + HIDDEN_SUFFIX, null);
+				responseWriter.writeAttribute("name", clientId + HIDDEN_SUFFIX, null);
+				responseWriter.writeAttribute("type", "hidden", null);
+				responseWriter.writeAttribute("value", "", null);
+				responseWriter.endElement("input");
 			}
 		}
 	}
@@ -169,7 +165,7 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 
 			// Finish the encoding of the outermost </div> element.
 			ResponseWriter responseWriter = facesContext.getResponseWriter();
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.endElement("div");
 		}
 	}
 
@@ -203,7 +199,7 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 
 		String autocompleteAttr = autoComplete.getAutocomplete();
 
-		if (StringPool.ON.equals(autocompleteAttr)) {
+		if ("on".equals(autocompleteAttr)) {
 
 			encodeBoolean(responseWriter, ALLOW_BROWSER_AUTOCOMPLETE, true, first);
 			first = false;
@@ -216,7 +212,7 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 
 		if ((valueChangeClientBehaviors != null) && !valueChangeClientBehaviors.isEmpty()) {
 
-			encodeNonEscapedObject(responseWriter, StringPool.AFTER, VALUE_CHANGE_SCRIPT, first);
+			encodeNonEscapedObject(responseWriter, "after", VALUE_CHANGE_SCRIPT, first);
 			first = false;
 		}
 	}
@@ -230,25 +226,25 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 			//J-
 			// source: ['item1', 'item2', 'item3', ... 'itemN']
 			//J+
-			encodeNonEscapedObject(responseWriter, SOURCE, StringPool.BLANK, first);
+			encodeNonEscapedObject(responseWriter, SOURCE, "", first);
 
 			List<String> results = new ArrayList<String>();
 			results.addAll(autoComplete.getAllItems(facesContext));
 
-			responseWriter.write(StringPool.OPEN_BRACKET);
+			responseWriter.write("[");
 
 			for (int i = 0; i < results.size(); i++) {
 
 				if (i > 0) {
-					responseWriter.write(StringPool.COMMA);
+					responseWriter.write(",");
 				}
 
-				responseWriter.write(StringPool.APOSTROPHE);
+				responseWriter.write("'");
 				responseWriter.write(results.get(i));
-				responseWriter.write(StringPool.APOSTROPHE);
+				responseWriter.write("'");
 			}
 
-			responseWriter.write(StringPool.CLOSE_BRACKET);
+			responseWriter.write("]");
 		}
 	}
 
@@ -309,7 +305,7 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 
 				// Build up a fragment of JavaScript that gets the client-side component.
 				ClientComponent clientComponent = (ClientComponent) uiComponent;
-				String clientVarName = ComponentUtil.getClientVarName(facesContext, clientComponent);
+				String clientVarName = getClientVarName(facesContext, clientComponent);
 				String clientKey = clientComponent.getClientKey();
 
 				if (clientKey == null) {
@@ -329,20 +325,20 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 				//J+
 				StringBuilder resultArrayStringBuilder = new StringBuilder();
 
-				resultArrayStringBuilder.append(StringPool.OPEN_BRACKET);
+				resultArrayStringBuilder.append("[");
 
 				for (int i = 0; i < items.size(); i++) {
 
 					if (i > 0) {
-						resultArrayStringBuilder.append(StringPool.COMMA);
+						resultArrayStringBuilder.append(",");
 					}
 
-					resultArrayStringBuilder.append(StringPool.APOSTROPHE);
+					resultArrayStringBuilder.append("'");
 					resultArrayStringBuilder.append(items.get(i));
-					resultArrayStringBuilder.append(StringPool.APOSTROPHE);
+					resultArrayStringBuilder.append("'");
 				}
 
-				resultArrayStringBuilder.append(StringPool.CLOSE_BRACKET);
+				resultArrayStringBuilder.append("]");
 
 				// Buffer all JavaScript so that it is rendered in the <eval> section of the partial response.
 				BufferedScriptResponseWriter bufferedScriptResponseWriter = new BufferedScriptResponseWriter();
@@ -355,21 +351,7 @@ public class AutoCompleteRenderer extends AutoCompleteRendererBase {
 					liferayComponentJavaScriptFragment, resultArrayStringBuilder, hiddenClientId);
 
 				String[] modules = getModules(facesContext, uiComponent);
-				StringBuilder useStringBuilder = new StringBuilder();
-
-				for (int i = 0; i < modules.length; i++) {
-
-					if (i > 0) {
-						useStringBuilder.append(", ");
-					}
-
-					useStringBuilder.append(modules[i]);
-				}
-
-				ClientScriptFactory clientScriptFactory = (ClientScriptFactory) FactoryExtensionFinder.getFactory(
-						ClientScriptFactory.class);
-				ClientScript clientScript = clientScriptFactory.getClientScript();
-				clientScript.append(bufferedScriptResponseWriter.toString(), useStringBuilder.toString());
+				renderScript(facesContext, bufferedScriptResponseWriter.toString(), modules);
 			}
 			else {
 				super.encodeJavaScript(facesContext, uiComponent);

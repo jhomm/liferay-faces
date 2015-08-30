@@ -15,7 +15,6 @@ package com.liferay.faces.bridge.context.internal;
 
 import java.util.Iterator;
 
-import javax.faces.FacesException;
 import javax.faces.application.ProjectStage;
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
@@ -47,7 +46,7 @@ public class ExceptionHandlerAjaxImpl extends ExceptionHandlerWrapper {
 	}
 
 	@Override
-	public void handle() throws FacesException {
+	public void handle() {
 
 		// Before delegating, log all exceptions to the console.
 		Iterable<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents();

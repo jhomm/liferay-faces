@@ -5,9 +5,8 @@
 	<ui:define name="col1">
 		<showcase:example>
 			<alloy:form>
-				<alloy:tabView id="wizard" selectedIndex="#{tabViewWizardBean.selectedTabIndex}"
-					tabSelectListener="#{tabViewWizardBean.tabSelectListener}">
-					<f:ajax event="tabSelect" />
+				<alloy:tabView id="wizard" selectedIndex="#{tabViewWizardBean.selectedTabIndex}">
+					<f:ajax event="tabSelect" listener="#{tabViewWizardBean.tabSelectListener}"/>
 					<alloy:tab headerText="#{i18n['step-1']}">
 						<alloy:fieldset id="step1">
 							<alloy:field label="#{i18n['first-name']}">

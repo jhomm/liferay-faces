@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test;
+//J-
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +36,7 @@ import com.liferay.faces.test.util.TesterBase;
 
 
 /**
- * @author  Liferay Faces Team
+ * @author	Liferay Faces Team
  */
 @RunWith(Arquillian.class)
 public class Primefaces4UsersPortletTest extends TesterBase {
@@ -306,7 +307,7 @@ public class Primefaces4UsersPortletTest extends TesterBase {
 	private WebElement changedUserEmailAddressCell;
 	@FindBy(xpath = changedUserJobTitleCellXpath)
 	private WebElement changedUserJobTitleCell;
-	
+
 	@Drone
 	WebDriver browser;
 
@@ -317,11 +318,11 @@ public class Primefaces4UsersPortletTest extends TesterBase {
 		browser.manage().window().maximize();
 		signIn(browser);
 		(new Actions(browser)).click(dropdownTestSetup);
-		
+
 		if(!controlPanelTestSetup.isDisplayed()) {
 			dropdownTestSetup.click();
 		}
-		
+
 		controlPanelTestSetup.click();
 		waitForElement(browser, usersLinkTestSetupXpath);
 		usersLinkTestSetup.click();
@@ -340,7 +341,7 @@ public class Primefaces4UsersPortletTest extends TesterBase {
 			selectStatusTestSetup.click();
 			(new Actions(browser)).sendKeys(Keys.ARROW_DOWN).sendKeys(Keys.TAB).perform();
 			Thread.sleep(250);
-			
+
 			if(isThere(browser, johnAdamsTestSetupXpath)) {
 				//no-op
 			} else {
@@ -365,11 +366,11 @@ public class Primefaces4UsersPortletTest extends TesterBase {
 		browser.manage().deleteAllCookies();
 		signIn(browser);
 		(new Actions(browser)).click(dropdownTestSetup);
-		
+
 		if(!controlPanelTestSetup.isDisplayed()) {
 			dropdownTestSetup.click();
 		}
-		
+
 		controlPanelTestSetup.click();
 		waitForElement(browser, usersLinkTestSetupXpath);
 		usersLinkTestSetup.click();
@@ -526,7 +527,7 @@ public class Primefaces4UsersPortletTest extends TesterBase {
 
 		logger.log(Level.INFO, "dropdownActiveField.isDisplayed() = " + dropdownActiveField.isDisplayed());
 		assertTrue(
-			"The The Dropdown Menu should be displayed  on the page and Active should be the selected item at this point but it is not.",
+			"The The Dropdown Menu should be displayed	on the page and Active should be the selected item at this point but it is not.",
 			dropdownActiveField.isDisplayed());
 
 		logger.log(Level.INFO, "portrait.isDisplayed() = " + portrait.isDisplayed());
@@ -843,3 +844,4 @@ public class Primefaces4UsersPortletTest extends TesterBase {
 			dropdownActiveSelectedField.isDisplayed());
 	}
 }
+//J+

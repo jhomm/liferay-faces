@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test;
+//J-
 
 import static org.junit.Assert.assertTrue;
 
@@ -32,7 +33,7 @@ import com.liferay.faces.test.util.TesterBase;
 
 
 /**
- * @author  Liferay Faces Team
+ * @author	Liferay Faces Team
  */
 @RunWith(Arquillian.class)
 public class FACES224PortletTest extends TesterBase {
@@ -40,8 +41,6 @@ public class FACES224PortletTest extends TesterBase {
 	private static final Logger logger = Logger.getLogger(FACES224PortletTest.class.getName());
 
 	// portlet topper and menu elements
-	private static final String portletDisplayNameXpath = "//header[@class='portlet-topper']/h1/span";
-
 	private static final String formTagXpath = "//form[@method='post']";
 
 	// <input id="A2535:httpGetButton" type="button" value="Click me to render view2.xhtml via HTTP GET">
@@ -52,17 +51,15 @@ public class FACES224PortletTest extends TesterBase {
 	// the issue is fixed, the value should be equal to 'xyz')</div> </div>
 	private static final String view2DivXpath = "//div[@class='portlet-body']/div[1]";
 
-	static final String url = baseUrl + "/web/bridge-issues/faces-224";
+	static final String url = baseUrl + webContext + "/faces-224";
 
-	@FindBy(xpath = portletDisplayNameXpath)
-	private WebElement portletDisplayName;
 	@FindBy(xpath = formTagXpath)
 	private WebElement formTag;
 	@FindBy(xpath = buttonXpath)
 	private WebElement button;
 	@FindBy(xpath = view2DivXpath)
 	private WebElement view2Div;
-	
+
 	@Drone
 	WebDriver browser;
 
@@ -71,11 +68,16 @@ public class FACES224PortletTest extends TesterBase {
 	@InSequence(1000)
 	public void FACES224PortletViewMode() throws Exception {
 
+		if ("pluto".equals(portal)) {
+			signIn(browser);
+		}
+
 		logger.log(Level.INFO, "browser.navigate().to(" + url + ")");
 		browser.navigate().to(url);
 		logger.log(Level.INFO, "browser.getTitle() = " + browser.getTitle());
 		logger.log(Level.INFO, "browser.getCurrentUrl() = " + browser.getCurrentUrl());
-		logger.log(Level.INFO, "portletDisplayName.getText() = " + portletDisplayName.getText());
+		getPortletDisplayName();
+		logger.log(Level.INFO, "displayName.getText() = " + displayName.getText());
 
 		logger.log(Level.INFO, "button.isDisplayed() = " + button.isDisplayed());
 
@@ -111,3 +113,4 @@ public class FACES224PortletTest extends TesterBase {
 	}
 
 }
+//J+

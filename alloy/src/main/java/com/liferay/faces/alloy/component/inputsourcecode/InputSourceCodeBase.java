@@ -29,7 +29,7 @@ public abstract class InputSourceCodeBase extends HtmlInputText implements Style
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.inputsourcecode.InputSourceCode";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputsourcecode.internal.InputSourceCodeRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputsourcecode.InputSourceCodeRenderer";
 
 	// Protected Enumerations
 	protected enum InputSourceCodePropertyKeys {
@@ -78,6 +78,23 @@ public abstract class InputSourceCodeBase extends HtmlInputText implements Style
 
 	public void setHighlightActiveLine(Boolean highlightActiveLine) {
 		getStateHelper().put(InputSourceCodePropertyKeys.highlightActiveLine, highlightActiveLine);
+	}
+
+	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
 	}
 
 	public String getLocale() {

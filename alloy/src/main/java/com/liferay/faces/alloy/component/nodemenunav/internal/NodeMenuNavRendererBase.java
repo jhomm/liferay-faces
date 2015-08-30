@@ -24,7 +24,6 @@ import javax.faces.context.ResponseWriter;
 import com.liferay.faces.alloy.component.menu.Menu;
 import com.liferay.faces.alloy.render.internal.DelegatingAlloyRendererBase;
 import com.liferay.faces.util.component.Styleable;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.render.internal.DelegationResponseWriter;
 
 
@@ -35,10 +34,7 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 
 	// Private constants
 	private static final String ALLOY_MODULE_NAME = "node-menunav"; // Needed when yui="false"
-
-	// Public constants
-	public static final String COLON_OPTIONS = ":options";
-	public static final String IMAGE = "image";
+	private static final String COLON_OPTIONS = ":options";
 
 	// Needed when yui="false"
 	// Modules
@@ -76,8 +72,7 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 
 		if (!disabled) {
 
-			String escapedOptionsDivId = escapeClientId(getDefaultOptionsId(facesContext, uiComponent) +
-					StringPool.COLON + "0");
+			String escapedOptionsDivId = escapeClientId(getDefaultOptionsId(facesContext, uiComponent) + ":0");
 
 			// AlloyRendererUtil.LIFERAY_Z_INDEX_OVERLAY
 			responseWriter.write("A.one('#");
@@ -109,22 +104,22 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 	public void encodeLabel(UIComponent uiComponent, ResponseWriter responseWriter, FacesContext facesContext,
 		int depth) throws IOException {
 
-		UIComponent facet = uiComponent.getFacet(StringPool.LABEL);
+		UIComponent facet = uiComponent.getFacet("label");
 
 		if (facet == null) {
-			String label = (String) uiComponent.getAttributes().get(StringPool.LABEL);
+			String label = (String) uiComponent.getAttributes().get("label");
 
 			if (label == null) {
 
 				if (depth == 0) {
-					responseWriter.startElement(StringPool.SPAN, uiComponent);
-					responseWriter.writeAttribute(StringPool.CLASS, "caret", StringPool.CLASS);
-					responseWriter.endElement(StringPool.SPAN);
+					responseWriter.startElement("span", uiComponent);
+					responseWriter.writeAttribute("class", "caret", "class");
+					responseWriter.endElement("span");
 				}
 				else {
-					responseWriter.startElement(StringPool.SPAN, uiComponent);
-					responseWriter.write(StringPool.NBSP);
-					responseWriter.endElement(StringPool.SPAN);
+					responseWriter.startElement("span", uiComponent);
+					responseWriter.write("&nbsp;");
+					responseWriter.endElement("span");
 				}
 			}
 			else {
@@ -144,21 +139,20 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 		String clientId = uiComponent.getClientId(facesContext);
 
 		// start yui3-menu div
-		responseWriter.startElement(StringPool.DIV, uiComponent);
-		responseWriter.writeAttribute(StringPool.ID, clientId, StringPool.ID);
-		responseWriter.writeAttribute(StringPool.CLASS, "yui3-menu yui3-menu-horizontal yui3-splitbuttonnav",
-			StringPool.CLASS);
+		responseWriter.startElement("div", uiComponent);
+		responseWriter.writeAttribute("id", clientId, "id");
+		responseWriter.writeAttribute("class", "yui3-menu yui3-menu-horizontal yui3-splitbuttonnav", "class");
 
 		// start yui3-menu-content div
-		responseWriter.startElement(StringPool.DIV, uiComponent);
-		responseWriter.writeAttribute(StringPool.CLASS, "yui3-menu-content", StringPool.CLASS);
+		responseWriter.startElement("div", uiComponent);
+		responseWriter.writeAttribute("class", "yui3-menu-content", "class");
 
-		responseWriter.startElement(StringPool.UL, uiComponent);
-		responseWriter.startElement(StringPool.LI, uiComponent);
+		responseWriter.startElement("ul", uiComponent);
+		responseWriter.startElement("li", uiComponent);
 
 		// Start the span containing the btn-group
-		responseWriter.startElement(StringPool.SPAN, uiComponent);
-		responseWriter.writeAttribute(StringPool.CLASS, "yui3-menu-label btn-group", StringPool.CLASS);
+		responseWriter.startElement("span", uiComponent);
+		responseWriter.writeAttribute("class", "yui3-menu-label btn-group", "class");
 
 		// ResponseWriter blocks the text value and blocks writing of URIAttributes, if necessary
 		Map<String, Object> attributes = uiComponent.getAttributes();
@@ -198,13 +192,12 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 		String defaultOptionsDivId = getDefaultOptionsId(facesContext, uiComponent);
 
 		responseWriter.startElement("a", uiComponent);
-		responseWriter.writeAttribute(StringPool.CLASS, styleClass, StringPool.CLASS);
+		responseWriter.writeAttribute("class", styleClass, "class");
 
 		int depth = 0;
 
 		if (!disabled) {
-			responseWriter.writeAttribute(StringPool.HREF,
-				StringPool.POUND + defaultOptionsDivId + StringPool.COLON + depth, StringPool.HREF);
+			responseWriter.writeAttribute("href", "#" + defaultOptionsDivId + ":" + depth, "href");
 		}
 
 		List<UIComponent> children = uiComponent.getChildren();
@@ -218,7 +211,7 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 				responseWriter.endElement("a");
 
 				// End the span containing the btn-group
-				responseWriter.endElement(StringPool.SPAN);
+				responseWriter.endElement("span");
 
 				// Recurse over (first and only expected) menu
 				encodeMenuRecurse(child, responseWriter, disabled, styleClass, defaultOptionsDivId, depth,
@@ -228,29 +221,29 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 			}
 		}
 
-		responseWriter.endElement(StringPool.LI);
-		responseWriter.endElement(StringPool.UL);
+		responseWriter.endElement("li");
+		responseWriter.endElement("ul");
 
 		// end yui3-menu-content div
-		responseWriter.endElement(StringPool.DIV);
+		responseWriter.endElement("div");
 
 		// end yui3-menu div
-		responseWriter.endElement(StringPool.DIV);
+		responseWriter.endElement("div");
 	}
 
 	public void encodeMenuRecurse(UIComponent uiComponent, ResponseWriter responseWriter, boolean disabled,
 		String styleClass, String optionsDivId, int depth, FacesContext facesContext) throws IOException {
 
-		String menuId = optionsDivId + StringPool.COLON + depth;
+		String menuId = optionsDivId + ":" + depth;
 
 		// Start a listItem tag for a sub-menu
 		if (depth > 0) {
-			responseWriter.startElement(StringPool.LI, uiComponent);
+			responseWriter.startElement("li", uiComponent);
 			responseWriter.startElement("a", uiComponent);
-			responseWriter.writeAttribute(StringPool.CLASS, "yui3-menu-label", StringPool.CLASS);
+			responseWriter.writeAttribute("class", "yui3-menu-label", "class");
 
 			if (!disabled) {
-				responseWriter.writeAttribute(StringPool.HREF, StringPool.POUND + menuId, StringPool.HREF);
+				responseWriter.writeAttribute("href", "#" + menuId, "href");
 			}
 
 			encodeLabel(uiComponent, responseWriter, facesContext, depth);
@@ -258,9 +251,9 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 		}
 
 		// Start inner yui3-menu div
-		responseWriter.startElement(StringPool.DIV, uiComponent);
-		responseWriter.writeAttribute(StringPool.ID, menuId, StringPool.ID);
-		responseWriter.writeAttribute(StringPool.CLASS, "yui3-menu", StringPool.CLASS);
+		responseWriter.startElement("div", uiComponent);
+		responseWriter.writeAttribute("id", menuId, "id");
+		responseWriter.writeAttribute("class", "yui3-menu", "class");
 
 		// Hide the main menu to prevent blinking
 		if (depth == 0) {
@@ -268,18 +261,18 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 		}
 
 		// Start inner yui3-menu-content div
-		responseWriter.startElement(StringPool.DIV, uiComponent);
-		responseWriter.writeAttribute(StringPool.CLASS, "yui3-menu-content", StringPool.CLASS);
+		responseWriter.startElement("div", uiComponent);
+		responseWriter.writeAttribute("class", "yui3-menu-content", "class");
 
-		responseWriter.startElement(StringPool.UL, uiComponent);
+		responseWriter.startElement("ul", uiComponent);
 
 		// Encode the children of the menu
 		List<UIComponent> children = uiComponent.getChildren();
 
 		for (UIComponent child : children) {
 
-			responseWriter.startElement(StringPool.LI, uiComponent);
-			responseWriter.writeAttribute(StringPool.CLASS, "yui3-menuitem", StringPool.CLASS);
+			responseWriter.startElement("li", uiComponent);
+			responseWriter.writeAttribute("class", "yui3-menuitem", "class");
 
 			ResponseWriter originalResponseWriter = facesContext.getResponseWriter();
 			DelegationResponseWriter delegationResponseWriter = new NodeMenuNavMenuResponseWriter(
@@ -287,20 +280,20 @@ public abstract class NodeMenuNavRendererBase extends DelegatingAlloyRendererBas
 			facesContext.setResponseWriter(delegationResponseWriter);
 			child.encodeAll(facesContext);
 			facesContext.setResponseWriter(originalResponseWriter);
-			responseWriter.endElement(StringPool.LI);
+			responseWriter.endElement("li");
 		}
 
-		responseWriter.endElement(StringPool.UL);
+		responseWriter.endElement("ul");
 
 		// End inner yui3-menu-content div
-		responseWriter.endElement(StringPool.DIV);
+		responseWriter.endElement("div");
 
 		// End inner yui3-menu div
-		responseWriter.endElement(StringPool.DIV);
+		responseWriter.endElement("div");
 
 		// End the listItem tag for a sub-menu
 		if (depth > 0) {
-			responseWriter.endElement(StringPool.LI);
+			responseWriter.endElement("li");
 		}
 	}
 

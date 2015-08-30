@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test;
+//J-
 
 import static org.junit.Assert.assertTrue;
 
@@ -31,7 +32,7 @@ import org.openqa.selenium.support.FindBy;
 import com.liferay.faces.test.util.TesterBase;
 
 /**
- * @author  Liferay Faces Team
+ * @author	Liferay Faces Team
  */
 @RunWith(Arquillian.class)
 public class Jsf2ExportPdfPortletTest extends TesterBase {
@@ -53,7 +54,7 @@ public class Jsf2ExportPdfPortletTest extends TesterBase {
 	private WebElement LizExport;
 	@FindBy(xpath = richExportXpath)
 	private WebElement richExport;
-	
+
 	@Drone
 	WebDriver browser;
 
@@ -71,23 +72,23 @@ public class Jsf2ExportPdfPortletTest extends TesterBase {
 		logger.log(Level.INFO, "displayName.getText() = " + displayName.getText());
 
 		assertTrue("customerPortletDisplayName displayName.isDisplayed()", displayName.isDisplayed());
-		
+
 		if (isThere(browser, brianExportXpath)) {
 			logger.log(Level.INFO, "isThere(brianExportXpath) = " + isThere(browser, brianExportXpath));
 			richExport.click();
 			long sleepDuration = 500;
 			Thread.sleep(sleepDuration);
-			
+
 			Set<String> handles = browser.getWindowHandles();
 			for (String window : handles) {
-                browser.switchTo().window(window);
-                logger.log(Level.INFO, "window = " + window);
-                logger.log(Level.INFO, "browser.getTitle() = " + browser.getTitle());
-    			logger.log(Level.INFO, "browser.getCurrentUrl() = " + browser.getCurrentUrl());
-    			logger.log(Level.INFO, "browser.getPageSource() = " + browser.getPageSource());
-    			logger.log(Level.INFO, " -------------------------------------------------- ");
-            }
-			
+				browser.switchTo().window(window);
+				logger.log(Level.INFO, "window = " + window);
+				logger.log(Level.INFO, "browser.getTitle() = " + browser.getTitle());
+				logger.log(Level.INFO, "browser.getCurrentUrl() = " + browser.getCurrentUrl());
+				logger.log(Level.INFO, "browser.getPageSource() = " + browser.getPageSource());
+				logger.log(Level.INFO, " -------------------------------------------------- ");
+			}
+
 			boolean done = false;
 			while (!done) {
 				if (browser.getPageSource().contains("Shearer")) {
@@ -105,16 +106,17 @@ public class Jsf2ExportPdfPortletTest extends TesterBase {
 					}
 				}
 			}
-			
+
 			logger.log(Level.INFO, "browser.getPageSource().contains('Shearer') = " + browser.getPageSource().contains("Shearer"));
 			logger.log(Level.INFO, " -------------------------------------------------- ");
-			
+
 			assertTrue("The pdf document should contain 'Shearer', but instead it contains: " + browser.getPageSource(),
 				browser.getPageSource().contains("Shearer")
 			);
-			
+
 		}
 
 	}
 
 }
+//J+

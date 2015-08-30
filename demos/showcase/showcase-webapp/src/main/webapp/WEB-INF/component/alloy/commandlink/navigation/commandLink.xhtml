@@ -6,14 +6,12 @@
 		<alloy:form>
 			<showcase:example>
 				<alloy:field label="#{i18n['ajax']}">
-					<alloy:selectOneMenu value="#{commandBackingBean.ajax}">
-						<f:selectItem itemLabel="true" itemValue="true" />
-						<f:selectItem itemLabel="false" itemValue="false" />
+					<alloy:selectBooleanCheckbox value="#{commandModelBean.ajax}">
 						<f:ajax render="nav" />
-					</alloy:selectOneMenu>
+					</alloy:selectBooleanCheckbox>
 				</alloy:field>
 				<!-- Navigation based on outcome of navigation-case defined in navigation-rule.xml -->
-				<alloy:commandLink id="nav" action="toParam" ajax="#{commandBackingBean.ajax}">
+				<alloy:commandLink id="nav" action="toParam" ajax="#{commandModelBean.ajax}">
 					<alloy:outputText value="#{i18n['to-param-page']} " />
 					<alloy:icon name="arrow-right" />
 				</alloy:commandLink>

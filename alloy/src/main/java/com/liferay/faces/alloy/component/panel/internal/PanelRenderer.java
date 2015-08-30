@@ -22,7 +22,6 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 
 import com.liferay.faces.alloy.component.panel.Panel;
-import com.liferay.faces.util.lang.StringPool;
 
 
 /**
@@ -48,24 +47,24 @@ public class PanelRenderer extends PanelRendererBase {
 		ResponseWriter responseWriter = facesContext.getResponseWriter();
 
 		if ((headerFacet != null) || (headerText != null)) {
-			responseWriter.startElement(StringPool.DIV, uiComponent);
+			responseWriter.startElement("div", uiComponent);
 			responseWriter.writeAttribute("class", "alloy-panel-heading", null);
 
 			if (headerFacet != null) {
 				headerFacet.encodeAll(facesContext);
 			}
 			else {
-				responseWriter.startElement(StringPool.SPAN, null);
-				responseWriter.writeAttribute(StringPool.CLASS, "alloy-panel-title", null);
+				responseWriter.startElement("span", null);
+				responseWriter.writeAttribute("class", "alloy-panel-title", null);
 				responseWriter.writeText(headerText, null);
-				responseWriter.endElement(StringPool.SPAN);
+				responseWriter.endElement("span");
 			}
 
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.endElement("div");
 		}
 
 		// Encode a starting <div> for the panel body.
-		responseWriter.startElement(StringPool.DIV, uiComponent);
+		responseWriter.startElement("div", uiComponent);
 		responseWriter.writeAttribute("class", "alloy-panel-body", null);
 	}
 
@@ -74,7 +73,7 @@ public class PanelRenderer extends PanelRendererBase {
 
 		// Encode the ending </div> for the panel body.
 		ResponseWriter responseWriter = facesContext.getResponseWriter();
-		responseWriter.endElement(StringPool.DIV);
+		responseWriter.endElement("div");
 
 		// If necessary, encode the <div>...</div> for the panel header.
 		Panel panel = (Panel) uiComponent;
@@ -82,19 +81,19 @@ public class PanelRenderer extends PanelRendererBase {
 		UIComponent footerFacet = uiComponent.getFacet("footer");
 
 		if ((footerFacet != null) || (footerText != null)) {
-			responseWriter.startElement(StringPool.DIV, uiComponent);
+			responseWriter.startElement("div", uiComponent);
 			responseWriter.writeAttribute("class", "alloy-panel-footer", null);
 
 			if (footerFacet != null) {
 				footerFacet.encodeAll(facesContext);
 			}
 			else {
-				responseWriter.startElement(StringPool.SPAN, null);
+				responseWriter.startElement("span", null);
 				responseWriter.writeText(footerText, null);
-				responseWriter.endElement(StringPool.SPAN);
+				responseWriter.endElement("span");
 			}
 
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.endElement("div");
 		}
 
 		// Delegate to the JSF runtime renderer in order to finish encoding the outermost </div> of the panel.

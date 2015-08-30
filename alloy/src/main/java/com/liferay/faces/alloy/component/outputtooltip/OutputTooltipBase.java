@@ -29,7 +29,7 @@ public abstract class OutputTooltipBase extends OutputTextBase implements Stylea
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.outputtooltip.OutputTooltip";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.outputtooltip.internal.OutputTooltipRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.outputtooltip.OutputTooltipRenderer";
 
 	// Protected Enumerations
 	protected enum OutputTooltipPropertyKeys {
@@ -91,7 +91,7 @@ public abstract class OutputTooltipBase extends OutputTextBase implements Stylea
 	}
 
 	public String getPosition() {
-		return (String) getStateHelper().eval(OutputTooltipPropertyKeys.position, com.liferay.faces.util.lang.StringPool.RIGHT);
+		return (String) getStateHelper().eval(OutputTooltipPropertyKeys.position, "right");
 	}
 
 	public void setPosition(String position) {

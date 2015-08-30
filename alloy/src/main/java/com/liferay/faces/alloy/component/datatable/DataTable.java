@@ -23,17 +23,14 @@ import java.util.Map;
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.behavior.AjaxBehavior;
 import javax.faces.component.behavior.Behavior;
-import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.behavior.ClientBehaviorHolder;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.FacesEvent;
 
-import com.liferay.faces.util.component.ComponentUtil;
 import com.liferay.faces.util.helper.IntegerHelper;
-import com.liferay.faces.util.lang.FacesConstants;
 
 
 /**
@@ -42,47 +39,31 @@ import com.liferay.faces.util.lang.FacesConstants;
 @FacesComponent(value = DataTable.COMPONENT_TYPE)
 public class DataTable extends DataTableBase implements ClientBehaviorHolder {
 
-	// Public Constants
-	public static final String STYLE_CLASS_NAME = "table table-bordered table-hover table-striped alloy-datatable";
-
 	// Private Constants
 	private static final Collection<String> EVENT_NAMES = Collections.unmodifiableCollection(Arrays.asList(
 				RowSelectEvent.ROW_SELECT, RowSelectRangeEvent.ROW_SELECT_RANGE, RowDeselectEvent.ROW_DESELECT,
 				RowDeselectRangeEvent.ROW_DESELECT_RANGE));
 
 	@Override
-	public void addClientBehavior(String eventName, ClientBehavior clientBehavior) {
-
-		// If the specified client behavior is an Ajax behavior, then the alloy:accordion component tag has an f:ajax
-		// child tag. Register a listener that can respond to the Ajax behavior by invoking the tabCollapseListener or
-		// tabExpandListener that may have been specified.
-		if (clientBehavior instanceof AjaxBehavior) {
-			AjaxBehavior ajaxBehavior = (AjaxBehavior) clientBehavior;
-			ajaxBehavior.addAjaxBehaviorListener(new DataTableBehaviorListener());
-		}
-
-		super.addClientBehavior(eventName, clientBehavior);
-	}
-
-	@Override
 	public void queueEvent(FacesEvent facesEvent) {
 
 		// This method is called by the AjaxBehavior renderer's decode() method. If the specified event is an ajax
-		// behavior event that indicates a row being selected/deselected, then
+		// behavior event, then
 		if (facesEvent instanceof AjaxBehaviorEvent) {
 
-			// Determine the client-side state of the selected tab index.
+			// Determine the client-side state of the selected row index.
 			FacesContext facesContext = FacesContext.getCurrentInstance();
-			Map<String, String> requestParameterMap = facesContext.getExternalContext().getRequestParameterMap();
-			String clientId = getClientId(facesContext);
+			ExternalContext externalContext = facesContext.getExternalContext();
+			Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+			String eventName = requestParameterMap.get("javax.faces.behavior.event");
 
-			// Queue an accordion tab event rather than the specified faces event.
-			AjaxBehaviorEvent behaviorEvent = (AjaxBehaviorEvent) facesEvent;
-			Behavior behavior = behaviorEvent.getBehavior();
-			String eventName = requestParameterMap.get(FacesConstants.JAVAX_FACES_BEHAVIOR_EVENT);
-
+			// If the AjaxBehaviorEvent indicates a row being selected/deselected, then
 			if (RowSelectEvent.ROW_SELECT.equals(eventName) || RowDeselectEvent.ROW_DESELECT.equals(eventName)) {
 
+				// Queue a row selection/deselection event rather than the specified faces event.
+				AjaxBehaviorEvent behaviorEvent = (AjaxBehaviorEvent) facesEvent;
+				Behavior behavior = behaviorEvent.getBehavior();
+				String clientId = getClientId(facesContext);
 				int originalRowIndex = getRowIndex();
 				int selectedRowIndex = IntegerHelper.toInteger(requestParameterMap.get(clientId + "_rowIndex"));
 				setRowIndex(selectedRowIndex);
@@ -97,15 +78,22 @@ public class DataTable extends DataTableBase implements ClientBehaviorHolder {
 					facesEvent = new RowDeselectEvent(this, behavior, selectedRowIndex, rowData);
 				}
 			}
-			else {
 
+			// If the AjaxBehaviorEvent indicates a row range being selected/deselected, then
+			else if (RowSelectRangeEvent.ROW_SELECT_RANGE.equals(eventName) ||
+					RowDeselectRangeEvent.ROW_DESELECT_RANGE.equals(eventName)) {
+
+				// Queue a row range selection/deselection event rather than the specified faces event.
+				AjaxBehaviorEvent behaviorEvent = (AjaxBehaviorEvent) facesEvent;
+				Behavior behavior = behaviorEvent.getBehavior();
+				String clientId = getClientId(facesContext);
 				String rowIndexRange = requestParameterMap.get(clientId + "_rowIndexRange");
 				int[] rowIndexArray = toIntArray(rowIndexRange);
 
 				if (RowSelectRangeEvent.ROW_SELECT_RANGE.equals(eventName)) {
 					facesEvent = new RowSelectRangeEvent(this, behavior, rowIndexArray, getRowDataList(rowIndexArray));
 				}
-				else if (RowDeselectRangeEvent.ROW_DESELECT_RANGE.equals(eventName)) {
+				else {
 					facesEvent = new RowDeselectRangeEvent(this, behavior, rowIndexArray,
 							getRowDataList(rowIndexArray));
 				}
@@ -121,7 +109,7 @@ public class DataTable extends DataTableBase implements ClientBehaviorHolder {
 		getAttributes().put("oldRows", getRows());
 	}
 
-	public int[] toIntArray(String commaDelimitedValue) {
+	public final int[] toIntArray(String commaDelimitedValue) {
 
 		int[] intArray = null;
 
@@ -172,16 +160,6 @@ public class DataTable extends DataTableBase implements ClientBehaviorHolder {
 		}
 
 		return rowDataList;
-	}
-
-	@Override
-	public String getStyleClass() {
-
-		// getStateHelper().eval(PropertyKeys.styleClass, null) is called because super.getStyleClass() may return the
-		// STYLE_CLASS_NAME of the super class.
-		String styleClass = (String) getStateHelper().eval(PropertyKeys.styleClass, null);
-
-		return ComponentUtil.concatCssClasses(styleClass, STYLE_CLASS_NAME);
 	}
 
 	@Override

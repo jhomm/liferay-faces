@@ -28,7 +28,7 @@ public abstract class SelectManyCheckboxBase extends HtmlSelectManyCheckbox impl
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.selectmanycheckbox.SelectManyCheckbox";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectmanycheckbox.internal.SelectManyCheckboxRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectmanycheckbox.SelectManyCheckboxRenderer";
 
 	// Protected Enumerations
 	protected enum SelectManyCheckboxPropertyKeys {
@@ -41,12 +41,29 @@ public abstract class SelectManyCheckboxBase extends HtmlSelectManyCheckbox impl
 	}
 
 	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
+	}
+
+	@Override
 	public String getStyleClass() {
 		// getStateHelper().eval(SelectManyCheckboxPropertyKeys.styleClass, null) is called because super.getStyleClass() may return the
 		// STYLE_CLASS_NAME of the super class.
 		String styleClass = (String) getStateHelper().eval(SelectManyCheckboxPropertyKeys.styleClass, null);
 
-		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-select-many-checkbox");
+		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-select-many-checkbox", "checkbox");
 	}
 
 	@Override

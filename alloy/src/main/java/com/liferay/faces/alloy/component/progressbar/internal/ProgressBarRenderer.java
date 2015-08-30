@@ -29,13 +29,9 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 
 import com.liferay.faces.alloy.component.progressbar.ProgressBar;
-import com.liferay.faces.util.client.ClientScript;
-import com.liferay.faces.util.client.ClientScriptFactory;
-import com.liferay.faces.util.component.ComponentUtil;
+import com.liferay.faces.alloy.render.internal.JavaScriptFragment;
 import com.liferay.faces.util.component.Styleable;
-import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.js.JavaScriptFragment;
-import com.liferay.faces.util.lang.StringPool;
+import com.liferay.faces.util.context.FacesRequestContext;
 import com.liferay.faces.util.render.RendererUtil;
 import com.liferay.faces.util.render.internal.BufferedScriptResponseWriter;
 
@@ -70,7 +66,7 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 
 		ResponseWriter responseWriter = facesContext.getResponseWriter();
 		ProgressBar progressBar = (ProgressBar) uiComponent;
-		String clientVarName = ComponentUtil.getClientVarName(facesContext, progressBar);
+		String clientVarName = getClientVarName(facesContext, progressBar);
 		String clientKey = progressBar.getClientKey();
 
 		if (clientKey == null) {
@@ -81,6 +77,8 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 		List<ClientBehavior> pollEventClientBehaviors = clientBehaviorMap.get("poll");
 
 		// If the developer has specified <f:ajax event="poll" />, then
+		String javaScriptText = "Liferay.component('".concat(clientKey).concat("')");
+
 		if ((pollEventClientBehaviors != null) && !pollEventClientBehaviors.isEmpty()) {
 
 			// Build up an anonymous function, which contains all clientBehaviors for the "poll" event, so that it can
@@ -89,13 +87,18 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 			//J-
 			//	function(pollingFunction) {
 			//		var event = null;
-			//		jsf.ajax.request(clientId, event, 'poll', {
-			//			render: clientId,
-			//			execute: clientId,
+			//		jsf.ajax.request('clientId', event, 'poll', {
+			//			render: 'clientId ' + render,
+			//			execute: 'clientId ' + execute,
 			//			onevent: function(data){
 			//				if(data.status==='success'){
 			//					pollingFunction();
 			//				}
+			//				onevent();
+			//			},
+			//			onerror: function(data){
+			//				Liferay.component('clientKey').stopPolling();
+			//				onerror();
 			//			}
 			//		});
 			//		jsf.ajax.request(...);
@@ -117,17 +120,26 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 					facesContext, progressBar, "poll", clientId, null);
 			int size = pollEventClientBehaviors.size();
 
+			//J-
+			//	Liferay.component('clientKey')
+			//J+
+			JavaScriptFragment liferayComponent = new JavaScriptFragment(javaScriptText);
+
 			// It is possible to specify multiple <f:ajax event="poll" /> tags (even though there is no benefit).
 			for (int i = 0; i < size; i++) {
 
 				ClientBehavior pollEventClientBehavior = pollEventClientBehaviors.get(i);
 
-				// Ensure that "@this" is present in the render attribute for one of the clientBehaviors. That will
-				// cause this renderer to be invoked when a polling ajax request occurs.
 				if (i == 0) {
 
-					AjaxBehavior ajaxBehavior = (AjaxBehavior) pollEventClientBehavior;
-					pollEventClientBehavior = new ProgressBarAjaxBehavior(ajaxBehavior, "@this", "pollingFunction");
+					AjaxBehavior firstPollEventAjaxBehavior = (AjaxBehavior) pollEventClientBehavior;
+					String stopPollingFunction = "function(){".concat(liferayComponent.toString()).concat(
+							".stopPolling();}");
+
+					// Ensure that render is '@this', execute is '@this', the pollingFunction is called onsuccess, and
+					// the stopPolling function is called onerror.
+					pollEventClientBehavior = new ProgressBarAjaxBehavior(firstPollEventAjaxBehavior, "pollingFunction",
+							stopPollingFunction);
 				}
 
 				buf.append(pollEventClientBehavior.getScript(clientBehaviorContext));
@@ -135,25 +147,26 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 			}
 
 			buf.append("}");
-			JavaScriptFragment anonymousFunction = new JavaScriptFragment(buf.toString());
 
-			//J-
-			//	Liferay.component('clientKey')
-			//J+
-			JavaScriptFragment liferayComponent = new JavaScriptFragment("Liferay.component('" + clientKey + "')");
+			JavaScriptFragment anonymousFunction = new JavaScriptFragment(buf.toString());
 			Integer pollingDelay = progressBar.getPollingDelay();
 
 			//J-
 			//	LFAI.initProgressBarServerMode(Liferay.component('clientKey'), 'clientId', pollingDelay,
 			//		function(pollingFunction) {
 			//			var event = null;
-			//			jsf.ajax.request(clientId, event, 'poll', {
-			//				render: clientId,
-			//				execute: clientId,
+			//			jsf.ajax.request('clientId', event, 'poll', {
+			//				render: 'clientId ' + render,
+			//				execute: 'clientId ' + execute,
 			//				onevent: function(data){
 			//					if(data.status==='success'){
 			//						pollingFunction();
 			//					}
+			//					onevent();
+			//				},
+			//				onerror: function(data){
+			//					Liferay.component('clientKey').stopPolling();
+			//					onerror();
 			//				}
 			//			});
 			//			jsf.ajax.request(...);
@@ -163,7 +176,7 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 			//	);
 			//J+
 			encodeFunctionCall(responseWriter, "LFAI.initProgressBarServerMode", liferayComponent, clientId,
-				pollingDelay, buf);
+				pollingDelay, anonymousFunction);
 		}
 
 		// Otherwise the component is in client mode.
@@ -172,7 +185,7 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 			//J-
 			//	LFAI.initProgressBarClientMode(Liferay.component('clientKey'), projectStageDevelopment);
 			//J+
-			JavaScriptFragment liferayComponent = new JavaScriptFragment("Liferay.component('" + clientKey + "')");
+			JavaScriptFragment liferayComponent = new JavaScriptFragment(javaScriptText);
 			encodeFunctionCall(responseWriter, "LFAI.initProgressBarClientMode", liferayComponent);
 		}
 	}
@@ -186,10 +199,10 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 
 			// Start the encoding of the outermost <div> element.
 			ResponseWriter responseWriter = facesContext.getResponseWriter();
-			responseWriter.startElement(StringPool.DIV, uiComponent);
+			responseWriter.startElement("div", uiComponent);
 
 			String clientId = uiComponent.getClientId(facesContext);
-			responseWriter.writeAttribute(StringPool.ID, clientId, StringPool.ID);
+			responseWriter.writeAttribute("id", clientId, "id");
 
 			Styleable styleable = (Styleable) uiComponent;
 			RendererUtil.encodeStyleable(responseWriter, styleable);
@@ -199,19 +212,19 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 			if (isServerPollingEnabled(uiComponent)) {
 
 				String hiddenClientId = clientId.concat(HIDDEN_SUFFIX);
-				responseWriter.startElement(StringPool.INPUT, null);
-				responseWriter.writeAttribute(StringPool.ID, hiddenClientId, null);
-				responseWriter.writeAttribute(StringPool.NAME, hiddenClientId, null);
-				responseWriter.writeAttribute(StringPool.TYPE, StringPool.HIDDEN, null);
-				responseWriter.writeAttribute(StringPool.VALUE, StringPool.BLANK, null);
-				responseWriter.endElement(StringPool.INPUT);
+				responseWriter.startElement("input", null);
+				responseWriter.writeAttribute("id", hiddenClientId, null);
+				responseWriter.writeAttribute("name", hiddenClientId, null);
+				responseWriter.writeAttribute("type", "hidden", null);
+				responseWriter.writeAttribute("value", "", null);
+				responseWriter.endElement("input");
 			}
 
 			// Encode the contentBox of the progressBar.
 			String contentBoxClientId = clientId.concat(CONTENT_BOX_SUFFIX);
-			responseWriter.startElement(StringPool.DIV, null);
-			responseWriter.writeAttribute(StringPool.ID, contentBoxClientId, null);
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.startElement("div", null);
+			responseWriter.writeAttribute("id", contentBoxClientId, null);
+			responseWriter.endElement("div");
 		}
 	}
 
@@ -224,7 +237,7 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 
 			// Finish the encoding of the outermost </div> element.
 			ResponseWriter responseWriter = facesContext.getResponseWriter();
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.endElement("div");
 		}
 	}
 
@@ -242,8 +255,8 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 		encodeClientId(responseWriter, CONTENT_BOX, contentBoxClientId, first);
 
 		// Begin encoding event listeners that occur on the event.
-		encodeNonEscapedObject(responseWriter, StringPool.ON, StringPool.BLANK, first);
-		responseWriter.write(StringPool.OPEN_CURLY_BRACE);
+		encodeNonEscapedObject(responseWriter, "on", "", first);
+		responseWriter.write("{");
 
 		// complete
 		boolean onFirst = true;
@@ -298,7 +311,7 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 		//J+
 		if ((label != null) && label.contains(TOKEN)) {
 
-			String escapedLabel = RendererUtil.escapeJavaScript(label);
+			String escapedLabel = escapeJavaScript(label);
 			encodeNonEscapedObject(responseWriter, VALUE_CHANGE,
 				"function(event){this.set('label','".concat(escapedLabel).concat(
 					"'.replace(LFAI.TOKEN_REGEX, event.newVal));}"), onFirst);
@@ -306,7 +319,7 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 		}
 
 		// Finish encoding event listeners that occur on the event.
-		responseWriter.write(StringPool.CLOSE_CURLY_BRACE);
+		responseWriter.write("}");
 	}
 
 	/**
@@ -319,7 +332,7 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 		if (isAjaxPolling(facesContext, uiComponent)) {
 
 			ProgressBar progressBar = (ProgressBar) uiComponent;
-			String clientVarName = ComponentUtil.getClientVarName(facesContext, progressBar);
+			String clientVarName = getClientVarName(facesContext, progressBar);
 			String clientKey = progressBar.getClientKey();
 
 			if (clientKey == null) {
@@ -343,10 +356,8 @@ public class ProgressBarRenderer extends ProgressBarRendererBase {
 			encodeFunctionCall(bufferedScriptResponseWriter, "LFAI.setProgressBarServerValue", hiddenClientId,
 				liferayComponent, value);
 
-			ClientScriptFactory clientScriptFactory = (ClientScriptFactory) FactoryExtensionFinder.getFactory(
-					ClientScriptFactory.class);
-			ClientScript clientScript = clientScriptFactory.getClientScript();
-			clientScript.append(bufferedScriptResponseWriter.toString());
+			FacesRequestContext facesRequestContext = FacesRequestContext.getCurrentInstance();
+			facesRequestContext.addScript(bufferedScriptResponseWriter.toString());
 		}
 		else {
 			super.encodeJavaScript(facesContext, uiComponent);

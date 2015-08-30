@@ -23,9 +23,8 @@ import javax.faces.render.ResponseStateManager;
 import javax.portlet.PortalContext;
 import javax.portlet.PortletRequest;
 
-import com.liferay.faces.bridge.context.BridgePortalContext;
 import com.liferay.faces.bridge.context.BridgeContext;
-import com.liferay.faces.util.lang.StringPool;
+import com.liferay.faces.bridge.context.BridgePortalContext;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.product.Product;
@@ -116,7 +115,7 @@ public abstract class ResponseWriterBridgeCompat_2_0_Impl extends ResponseWriter
 
 				logger.trace("filtering marker");
 
-				int greaterThanPos = data.indexOf(StringPool.GREATER_THAN);
+				int greaterThanPos = data.indexOf(">");
 
 				if (greaterThanPos > 0) {
 					len -= (greaterThanPos + 1);
@@ -138,8 +137,8 @@ public abstract class ResponseWriterBridgeCompat_2_0_Impl extends ResponseWriter
 
 	protected void writeViewStateHiddenField() throws IOException {
 
-		startElement(StringPool.INPUT, null);
-		writeAttribute(StringPool.TYPE, StringPool.HIDDEN, null);
+		startElement("input", null);
+		writeAttribute("type", "hidden", null);
 
 		String viewStateName = PartialResponseWriter.VIEW_STATE_MARKER;
 
@@ -150,15 +149,15 @@ public abstract class ResponseWriterBridgeCompat_2_0_Impl extends ResponseWriter
 			viewStateName = namingContainerId + viewStateName;
 		}
 
-		writeAttribute(StringPool.NAME, viewStateName, null);
+		writeAttribute("name", viewStateName, null);
 
 		// TODO: The following line is a workaround and needs to be fixed in FACES-1797.
-		writeAttribute(StringPool.ID, viewStateName, null);
+		writeAttribute("id", viewStateName, null);
 
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		String viewState = facesContext.getApplication().getStateManager().getViewState(facesContext);
-		writeAttribute(StringPool.VALUE, viewState, null);
+		writeAttribute("value", viewState, null);
 		writeAttribute(ATTRIBUTE_AUTOCOMPLETE, VALUE_OFF, null);
-		endElement(StringPool.INPUT);
+		endElement("input");
 	}
 }

@@ -19,6 +19,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import com.liferay.faces.util.component.ClientComponent;
+
 
 /**
  * @author  Kyle Stiemann
@@ -69,7 +71,11 @@ public interface AlloyRenderer extends ClientComponentRenderer {
 
 	public String escapeClientId(String clientId);
 
+	public String escapeJavaScript(String javaScript);
+
 	public String getAlloyClassName(FacesContext facesContext, UIComponent uiComponent);
+
+	public String getClientVarName(FacesContext facesContext, ClientComponent clientComponent);
 
 	public String getYUIConfig(FacesContext facesContext, ResponseWriter responseWriter, UIComponent uiComponent)
 		throws IOException;

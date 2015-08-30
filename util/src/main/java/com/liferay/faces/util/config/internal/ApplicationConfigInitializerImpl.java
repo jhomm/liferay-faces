@@ -13,18 +13,19 @@
  */
 package com.liferay.faces.util.config.internal;
 
-import com.liferay.faces.util.config.ApplicationConfig;
-import com.liferay.faces.util.config.FacesConfig;
-import com.liferay.faces.util.config.WebConfig;
 import java.io.IOException;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
+import com.liferay.faces.util.config.ApplicationConfig;
+import com.liferay.faces.util.config.FacesConfig;
+import com.liferay.faces.util.config.WebConfig;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
-import com.liferay.faces.util.xml.SAXParserFactory;
+import com.liferay.faces.util.xml.ConcurrentSAXParserFactory;
 
 
 /**
@@ -53,7 +54,7 @@ public class ApplicationConfigInitializerImpl implements ApplicationConfigInitia
 		ResourceReader resourceReader = newResourceReader();
 
 		// Obtain a SAX Parser Factory.
-		SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+		SAXParserFactory saxParserFactory = ConcurrentSAXParserFactory.newInstance();
 		saxParserFactory.setValidating(false);
 		saxParserFactory.setNamespaceAware(true);
 

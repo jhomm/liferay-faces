@@ -15,7 +15,7 @@ package com.liferay.faces.alloy.component.autocomplete;
 //J-
 
 import javax.annotation.Generated;
-import com.liferay.faces.alloy.component.inputtext.AbstractInputText;
+import com.liferay.faces.alloy.component.inputtext.InputTextBase;
 
 import com.liferay.faces.util.component.Styleable;
 import com.liferay.faces.util.component.ClientComponent;
@@ -25,11 +25,11 @@ import com.liferay.faces.util.component.ClientComponent;
  * @author	Kyle Stiemann
  */
 @Generated(value = "com.liferay.alloy.tools.builder.FacesBuilder")
-public abstract class AutoCompleteBase extends AbstractInputText implements Styleable, ClientComponent {
+public abstract class AutoCompleteBase extends InputTextBase implements Styleable, ClientComponent {
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.autocomplete.AutoComplete";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.autocomplete.internal.AutoCompleteRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.autocomplete.AutoCompleteRenderer";
 
 	// Protected Enumerations
 	protected enum AutoCompletePropertyKeys {
@@ -43,7 +43,6 @@ public abstract class AutoCompleteBase extends AbstractInputText implements Styl
 		delimiter,
 		height,
 		highlighterType,
-		itemSelectListener,
 		listItemRequired,
 		maxItems,
 		minChars,
@@ -139,14 +138,6 @@ public abstract class AutoCompleteBase extends AbstractInputText implements Styl
 
 	public void setHighlighterType(String highlighterType) {
 		getStateHelper().put(AutoCompletePropertyKeys.highlighterType, highlighterType);
-	}
-
-	public javax.el.MethodExpression getItemSelectListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(AutoCompletePropertyKeys.itemSelectListener, null);
-	}
-
-	public void setItemSelectListener(javax.el.MethodExpression itemSelectListener) {
-		getStateHelper().put(AutoCompletePropertyKeys.itemSelectListener, itemSelectListener);
 	}
 
 	public boolean isListItemRequired() {

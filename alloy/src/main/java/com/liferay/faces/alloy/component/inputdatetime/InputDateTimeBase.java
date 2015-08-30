@@ -15,7 +15,7 @@ package com.liferay.faces.alloy.component.inputdatetime;
 //J-
 
 import javax.annotation.Generated;
-import com.liferay.faces.alloy.component.inputtext.AbstractInputText;
+import com.liferay.faces.alloy.component.inputtext.InputTextBase;
 
 import com.liferay.faces.util.component.Styleable;
 
@@ -24,18 +24,18 @@ import com.liferay.faces.util.component.Styleable;
  * @author	Kyle Stiemann
  */
 @Generated(value = "com.liferay.alloy.tools.builder.FacesBuilder")
-public abstract class InputDateTimeBase extends AbstractInputText implements Styleable {
+public abstract class InputDateTimeBase extends InputTextBase implements Styleable {
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.inputdatetime.InputDateTime";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputdatetime.internal.InputDateTimeRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputdatetime.InputDateTimeRenderer";
 
 	// Protected Enumerations
 	protected enum InputDateTimePropertyKeys {
 		autoHide,
 		clientKey,
 		locale,
-		responsive,
+		nativeWhenMobile,
 		showOn,
 		styleClass,
 		timeZone,
@@ -71,12 +71,12 @@ public abstract class InputDateTimeBase extends AbstractInputText implements Sty
 		getStateHelper().put(InputDateTimePropertyKeys.locale, locale);
 	}
 
-	public boolean isResponsive() {
-		return (Boolean) getStateHelper().eval(InputDateTimePropertyKeys.responsive, true);
+	public boolean isNativeWhenMobile() {
+		return (Boolean) getStateHelper().eval(InputDateTimePropertyKeys.nativeWhenMobile, true);
 	}
 
-	public void setResponsive(boolean responsive) {
-		getStateHelper().put(InputDateTimePropertyKeys.responsive, responsive);
+	public void setNativeWhenMobile(boolean nativeWhenMobile) {
+		getStateHelper().put(InputDateTimePropertyKeys.nativeWhenMobile, nativeWhenMobile);
 	}
 
 	public String getShowOn() {

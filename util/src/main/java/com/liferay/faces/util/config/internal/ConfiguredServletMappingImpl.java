@@ -14,7 +14,6 @@
 package com.liferay.faces.util.config.internal;
 
 import com.liferay.faces.util.config.ConfiguredServletMapping;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -30,51 +29,53 @@ public class ConfiguredServletMappingImpl implements ConfiguredServletMapping {
 	private static final Logger logger = LoggerFactory.getLogger(ConfiguredServletMappingImpl.class);
 
 	// Private Strings
-	private static final String EXTENSION_WILDCARD = StringPool.STAR + StringPool.PERIOD;
+	private static final String EXTENSION_WILDCARD = "*.";
 
 	// Private Data Members
 	private String extension;
 	private boolean extensionMapped;
+	private boolean implicit;
 	private String path;
 	private boolean pathMapped;
 	private String servletName;
 	private String urlPattern;
 
-	public ConfiguredServletMappingImpl(String servletName, String urlPattern) {
+	public ConfiguredServletMappingImpl(String servletName, String urlPattern, boolean implicit) {
 
 		this.servletName = servletName;
 		this.urlPattern = urlPattern;
+		this.implicit = implicit;
 
 		if (urlPattern != null) {
 
 			// If the specified urlPattern is path-mapped (like /views/foo/bar/*), then set a flag and remember the
 			// path (/views/foo/bar).
-			if (urlPattern.startsWith(StringPool.FORWARD_SLASH) && urlPattern.endsWith(StringPool.STAR)) {
+			if (urlPattern.startsWith("/") && urlPattern.endsWith("*")) {
 				pathMapped = true;
-				path = urlPattern.substring(0,
-						urlPattern.length() - StringPool.FORWARD_SLASH.length() - StringPool.STAR.length());
+				path = urlPattern.substring(0, urlPattern.length() - "/".length() - "*".length());
 			}
 
 			// Otherwise, if the specified urlPattern is extension-mapped (like *.faces), then set a flag and remember
 			// the extension (.faces).
+			else if (urlPattern.startsWith(EXTENSION_WILDCARD)) {
+
+				extensionMapped = true;
+				extension = urlPattern.substring("*".length());
+			}
+
+			// Otherwise, assume that the specified urlPattern is path-mapped without a wildcard (like /foo/bar)
 			else {
 
-				if (urlPattern.startsWith(EXTENSION_WILDCARD)) {
-					extensionMapped = true;
-					extension = urlPattern.substring(StringPool.STAR.length());
-				}
+				pathMapped = true;
+				path = urlPattern;
 			}
 		}
 	}
 
-	public ConfiguredServletMappingImpl(String extension, boolean extensionMapped, String path, boolean pathMapped,
-		String servletName, String urlPattern) {
-		this.extension = extension;
-		this.extensionMapped = extensionMapped;
-		this.path = path;
-		this.pathMapped = pathMapped;
-		this.servletName = servletName;
-		this.urlPattern = urlPattern;
+	@Override
+	public String toString() {
+		return "extension=" + extension + " extensionMapped=" + extensionMapped + " path=" + path + " pathMapped=" +
+			pathMapped + " servletName=" + servletName + " urlPattern=" + urlPattern;
 	}
 
 	public boolean isExtensionMapped() {
@@ -97,12 +98,12 @@ public class ConfiguredServletMappingImpl implements ConfiguredServletMapping {
 
 			if (extensionMapped) {
 				match = uri.endsWith(extension);
-				logger.debug(
+				logger.trace(
 					"Testing match for servlet-mapping url-pattern=[{0}] EXTENSION=[{1}] uri=[{2}] match=[{3}]",
 					urlPattern, extension, uri, match);
 			}
 			else if (pathMapped) {
-				int pos = uri.lastIndexOf(StringPool.FORWARD_SLASH);
+				int pos = uri.lastIndexOf("/");
 				String uriPath = uri;
 
 				if (pos > 0) {
@@ -110,7 +111,7 @@ public class ConfiguredServletMappingImpl implements ConfiguredServletMapping {
 				}
 
 				match = (path.contains(uriPath) || uriPath.startsWith(path));
-				logger.debug("Testing match for servlet-mapping url-pattern=[{0}] PATH=[{1}] uri=[{2}] match=[{3}]",
+				logger.trace("Testing match for servlet-mapping url-pattern=[{0}] PATH=[{1}] uri=[{2}] match=[{3}]",
 					urlPattern, path, uri, match);
 			}
 		}
@@ -126,11 +127,12 @@ public class ConfiguredServletMappingImpl implements ConfiguredServletMapping {
 		return path;
 	}
 
+	@Override
+	public boolean isImplicit() {
+		return implicit;
+	}
+
 	public String getUrlPattern() {
 		return urlPattern;
-	}
-	
-	public String toString() {
-		return "TOSTRING extension=" + extension + " extensionMapped=" + extensionMapped + " path=" + path + " pathMapped=" + pathMapped + " servletName=" + servletName + " urlPattern=" + urlPattern;
 	}
 }

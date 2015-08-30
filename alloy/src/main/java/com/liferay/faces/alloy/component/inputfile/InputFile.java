@@ -13,14 +13,23 @@
  */
 package com.liferay.faces.alloy.component.inputfile;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import javax.el.MethodExpression;
+import javax.faces.application.FacesMessage;
 import javax.faces.component.FacesComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.FacesEvent;
-import javax.faces.event.PhaseId;
 
-import com.liferay.faces.util.component.ComponentUtil;
+import com.liferay.faces.util.context.MessageContext;
+import com.liferay.faces.util.context.MessageContextFactory;
+import com.liferay.faces.util.factory.FactoryExtensionFinder;
+import com.liferay.faces.util.logging.Logger;
+import com.liferay.faces.util.logging.LoggerFactory;
+import com.liferay.faces.util.model.UploadedFile;
 
 
 /**
@@ -28,6 +37,9 @@ import com.liferay.faces.util.component.ComponentUtil;
  */
 @FacesComponent(value = InputFile.COMPONENT_TYPE)
 public class InputFile extends InputFileBase {
+
+	// Logger
+	private static final Logger logger = LoggerFactory.getLogger(InputFile.class);
 
 	@Override
 	public void broadcast(FacesEvent facesEvent) throws AbortProcessingException {
@@ -48,19 +60,57 @@ public class InputFile extends InputFileBase {
 	}
 
 	@Override
-	public String getLabel() {
+	protected void validateValue(FacesContext facesContext, Object value) {
 
-		String label = super.getLabel();
+		setValid(true);
 
-		if (label == null) {
+		Long maxFileSize = getMaxFileSize();
+		String contentTypeSet = getContentTypes();
 
-			FacesContext facesContext = FacesContext.getCurrentInstance();
+		if ((maxFileSize != null) || (contentTypeSet != null)) {
 
-			if (facesContext.getCurrentPhaseId() == PhaseId.PROCESS_VALIDATIONS) {
-				label = ComponentUtil.getComponentLabel(this);
+			Locale locale = facesContext.getViewRoot().getLocale();
+			MessageContextFactory messageContextFactory = (MessageContextFactory) FactoryExtensionFinder.getFactory(
+					MessageContextFactory.class);
+			MessageContext messageContext = messageContextFactory.getMessageContext();
+			String clientId = getClientId(facesContext);
+			@SuppressWarnings("unchecked")
+			List<UploadedFile> uploadedFiles = (List<UploadedFile>) value;
+
+			for (UploadedFile uploadedFile : uploadedFiles) {
+
+				if ((maxFileSize != null) && (maxFileSize >= 0) && (uploadedFile.getSize() > maxFileSize)) {
+
+					String errorMessage = messageContext.getMessage(locale,
+							"file-x-is-y-bytes-but-may-not-exceed-z-bytes", uploadedFile.getName(),
+							uploadedFile.getSize(), maxFileSize);
+					handleInvalidFile(facesContext, clientId, uploadedFile, errorMessage);
+				}
+
+				String contentType = uploadedFile.getContentType();
+
+				if ((contentType == null) || ((contentTypeSet != null) && !contentTypeSet.contains(contentType))) {
+
+					String errorMessage = messageContext.getMessage(locale, "file-x-has-an-invalid-content-type-y",
+							uploadedFile.getName(), contentType);
+					handleInvalidFile(facesContext, clientId, uploadedFile, errorMessage);
+				}
 			}
 		}
+	}
 
-		return label;
+	private final void handleInvalidFile(FacesContext facesContext, String clientId, UploadedFile uploadedFile,
+		String errorMessage) {
+
+		facesContext.addMessage(clientId, new FacesMessage(FacesMessage.SEVERITY_ERROR, errorMessage, errorMessage));
+
+		setValid(false);
+
+		try {
+			uploadedFile.delete();
+		}
+		catch (IOException e) {
+			logger.error(e);
+		}
 	}
 }

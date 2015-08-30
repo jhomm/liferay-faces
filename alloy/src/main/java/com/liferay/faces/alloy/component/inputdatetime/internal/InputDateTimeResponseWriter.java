@@ -18,7 +18,6 @@ import java.io.IOException;
 import javax.faces.context.ResponseWriter;
 
 import com.liferay.faces.util.component.Styleable;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.render.internal.IdDelegationResponseWriter;
 
 
@@ -28,32 +27,29 @@ import com.liferay.faces.util.render.internal.IdDelegationResponseWriter;
 public class InputDateTimeResponseWriter extends IdDelegationResponseWriter {
 
 	// Private Data Members
-	private boolean mobile;
-	private boolean responsive;
+	private boolean nativeInputDateTime;
 
-	public InputDateTimeResponseWriter(ResponseWriter responseWriter, String idElement, String idValue, boolean mobile,
-		boolean responsive) {
-		super(responseWriter, idElement, idValue);
-		this.mobile = mobile;
-		this.responsive = responsive;
+	public InputDateTimeResponseWriter(ResponseWriter responseWriter, String inputClientId,
+		boolean nativeInputDateTime) {
+		super(responseWriter, "input", inputClientId);
+		this.nativeInputDateTime = nativeInputDateTime;
 	}
 
 	@Override
 	public void writeAttribute(String name, Object value, String property) throws IOException {
 
-		if (StringPool.CLASS.equalsIgnoreCase(name) || Styleable.STYLE.equalsIgnoreCase(name)) {
-			super.writeAttribute(name, "input-medium", property);
+		if ("class".equalsIgnoreCase(name)) {
+			super.writeAttribute(name, "input-medium field", property);
+		}
+		else if (Styleable.STYLE.equalsIgnoreCase(name)) {
+			// no-op because the style attribute is applied to the outermost div instead of the input.
 		}
 		else {
 			super.writeAttribute(name, value, property);
 		}
 	}
 
-	public boolean isMobile() {
-		return mobile;
-	}
-
-	public boolean isResponsive() {
-		return responsive;
+	public boolean isNative() {
+		return nativeInputDateTime;
 	}
 }

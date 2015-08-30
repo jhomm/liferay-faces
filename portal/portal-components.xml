@@ -51,15 +51,15 @@
               extendsTags="Styleable"
               parentClass="javax.faces.component.html.HtmlPanelGroup"
               rendererParentClass="com.liferay.faces.portal.render.internal.PortalTagRenderer&lt;com.liferay.faces.portal.component.header.Header, com.liferay.taglib.ui.HeaderTag&gt;">
-      <description><![CDATA[TODO.]]></description>
+      <description><![CDATA[The component is used to display header text by specifying the title attribute. It can also display a clickable back icon.]]></description>
       <attributes>
          <attribute>
-            <description><![CDATA[TODO.]]></description>
+            <description><![CDATA[This value will be used to populate the title attribute of the back icon.]]></description>
             <name>backLabel</name>
             <type>String</type>
          </attribute>
          <attribute>
-            <description><![CDATA[TODO.]]></description>
+            <description><![CDATA[The URL of the anchor tag rendered for the back icon.  The back icon is not rendered unless this is specified.]]></description>
             <name>backURL</name>
             <type>String</type>
          </attribute>
@@ -71,19 +71,19 @@
          </attribute>
          <attribute>
             <defaultValue>true</defaultValue>
-            <description><![CDATA[TODO.]]></description>
+            <description><![CDATA[When false, the back icon is not rendered. The default is true.]]></description>
             <name>showBackURL</name>
             <type>boolean</type>
          </attribute>
          <attribute>
-            <description><![CDATA[TODO.]]></description>
+            <description><![CDATA[This value will be used as the header text for the component.]]></description>
             <name>title</name>
             <type>String</type>
          </attribute>
       </attributes>
    </component>
 	<component name="InputRichText" generateJavaComponent="true" generateJavaRenderer="false" extendsTags="FacesMessageLabel Styleable UIInput"
-		parentClass="javax.faces.component.UIInput" rendererParentClass="com.liferay.faces.portal.render.internal.PortalTagRenderer&lt;com.liferay.faces.portal.component.inputrichtext.InputRichText, com.liferay.taglib.ui.InputEditorTag&gt;">
+		parentClass="javax.faces.component.UIInput" rendererParentClass="com.liferay.faces.portal.render.internal.DelayedPortalTagRenderer&lt;com.liferay.faces.portal.component.inputrichtext.InputRichText, com.liferay.taglib.ui.InputEditorTag&gt;">
 		<description><![CDATA[InputRichText is a UIInput component that renders a field for editing rich text.]]></description>
 		<attributes>
 			<attribute>
@@ -147,7 +147,7 @@
 				<type>boolean</type>
 			</attribute>
 			<attribute>
-				<defaultValue>"liferay"</defaultValue>
+				<defaultValue>null</defaultValue>
 				<description><![CDATA[The name of the set of toolbars that are to be displayed above the rich text input area. Valid values are "bbcode", "creole", "editInPlace", "email", "liferay", "liferayArticle", "phone", "simple", and "tablet". The default value depends on the value of the editorKey attribute. If editorKey's property evaluates to "ckeditor" then the default value is "liferay". If editorKey's property evaluates to "ckeditor_bbcode" then the default value is "bbcode". If editorKey's property evaluates to "ckeditor_creole" then the default value is "creole".]]></description>
 				<name>toolbarSet</name>
 				<type>String</type>
@@ -274,6 +274,7 @@
 				<type>String</type>
 			</attribute>
 			<attribute>
+				<defaultToComponentLabel>false</defaultToComponentLabel>
 				<description>
 					<![CDATA[The label of the anchor tag rendered inside the list item element.]]>
 				</description>

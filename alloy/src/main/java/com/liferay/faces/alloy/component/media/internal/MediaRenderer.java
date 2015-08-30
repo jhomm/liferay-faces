@@ -32,7 +32,6 @@ import com.liferay.faces.util.application.FacesResource;
 import com.liferay.faces.util.client.BrowserSniffer;
 import com.liferay.faces.util.client.BrowserSnifferFactory;
 import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.render.RendererUtil;
@@ -67,8 +66,8 @@ public abstract class MediaRenderer extends MediaRendererCompat {
 
 		String clientId = uiComponent.getClientId(facesContext);
 
-		responseWriter.writeAttribute(StringPool.ID, clientId, StringPool.ID);
-		responseWriter.writeAttribute(StringPool.NAME, clientId, null);
+		responseWriter.writeAttribute("id", clientId, "id");
+		responseWriter.writeAttribute("name", clientId, null);
 
 		Media media = (Media) uiComponent;
 		RendererUtil.encodeStyleable(responseWriter, media);
@@ -107,9 +106,9 @@ public abstract class MediaRenderer extends MediaRendererCompat {
 		encodeMediaSize(responseWriter, media);
 
 		// Encode JSF 2.1 passthrough attributes
-		RendererUtil.encodePassThroughAttributes(responseWriter, uiComponent, RendererUtil.KEYBOARD_DOM_EVENTS);
-		RendererUtil.encodePassThroughAttributes(responseWriter, uiComponent, RendererUtil.MOUSE_DOM_EVENTS);
-		RendererUtil.encodePassThroughAttributes(responseWriter, uiComponent, MEDIA_DOM_EVENTS);
+		encodePassThroughAttributes(responseWriter, uiComponent, KEYBOARD_DOM_EVENTS);
+		encodePassThroughAttributes(responseWriter, uiComponent, MOUSE_DOM_EVENTS);
+		encodePassThroughAttributes(responseWriter, uiComponent, MEDIA_DOM_EVENTS);
 
 		// Encode JSF 2.2 passthrough attributes (attributes prefixed with the http://xmlns.jcp.org/jsf/passthrough
 		// namespace)

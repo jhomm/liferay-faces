@@ -33,14 +33,10 @@ import javax.faces.render.FacesRenderer;
 import com.liferay.faces.alloy.component.inputdate.InputDate;
 import com.liferay.faces.alloy.component.inputdatetime.InputDateTime;
 import com.liferay.faces.alloy.component.inputdatetime.internal.InputDateTimeResponseWriter;
-import com.liferay.faces.alloy.component.inputtext.InputText;
+import com.liferay.faces.alloy.render.internal.JavaScriptFragment;
 import com.liferay.faces.util.client.BrowserSniffer;
 import com.liferay.faces.util.client.BrowserSnifferFactory;
-import com.liferay.faces.util.component.ComponentUtil;
 import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.js.JavaScriptFragment;
-import com.liferay.faces.util.lang.StringPool;
-import com.liferay.faces.util.render.RendererUtil;
 
 
 /**
@@ -68,8 +64,8 @@ public class InputDateRenderer extends InputDateRendererBase {
 		String mask = datePattern;
 
 		mask = mask.replaceAll("%", "%%");
-		mask = mask.replaceAll(StringPool.NEW_LINE, "%n");
-		mask = mask.replaceAll(StringPool.TAB, "%t");
+		mask = mask.replaceAll("\n", "%n");
+		mask = mask.replaceAll("\t", "%t");
 
 		mask = mask.replaceAll("yyyy", "%Y");
 		mask = mask.replaceAll("yy", "%y");
@@ -100,9 +96,9 @@ public class InputDateRenderer extends InputDateRendererBase {
 		InputDate inputDate = (InputDate) uiComponent;
 		String showOn = inputDate.getShowOn();
 
-		if ((browserSniffer.isMobile() && inputDate.isResponsive()) || "button".equals(showOn)) {
+		if (isNative(browserSniffer, inputDate) || "button".equals(showOn)) {
 
-			String clientVarName = ComponentUtil.getClientVarName(facesContext, inputDate);
+			String clientVarName = getClientVarName(facesContext, inputDate);
 			String clientKey = inputDate.getClientKey();
 
 			if (clientKey == null) {
@@ -112,7 +108,7 @@ public class InputDateRenderer extends InputDateRendererBase {
 			JavaScriptFragment liferayComponent = new JavaScriptFragment("Liferay.component('" + clientKey + "')");
 			ResponseWriter responseWriter = facesContext.getResponseWriter();
 
-			if (browserSniffer.isMobile() && inputDate.isResponsive()) {
+			if (isNative(browserSniffer, inputDate)) {
 
 				String clientId = uiComponent.getClientId(facesContext);
 				String inputClientId = clientId.concat(INPUT_SUFFIX);
@@ -163,8 +159,8 @@ public class InputDateRenderer extends InputDateRendererBase {
 		// key:value pairs via JSON syntax. For example: "calendar: {minDate: new Date(2015,1,1,0,0,0,0)}"
 		boolean calendarFirst = true;
 
-		encodeNonEscapedObject(responseWriter, "calendar", StringPool.BLANK, first);
-		responseWriter.write(StringPool.OPEN_CURLY_BRACE);
+		encodeNonEscapedObject(responseWriter, "calendar", "", first);
+		responseWriter.write("{");
 
 		Object maxDateObject = inputDate.getMaxDate();
 
@@ -191,10 +187,10 @@ public class InputDateRenderer extends InputDateRendererBase {
 
 		if (showOnButton || valueChangeClientBehaviorsNotEmpty) {
 
-			encodeNonEscapedObject(responseWriter, "on", StringPool.BLANK, calendarFirst);
-			responseWriter.write(StringPool.OPEN_CURLY_BRACE);
+			encodeNonEscapedObject(responseWriter, "on", "", calendarFirst);
+			responseWriter.write("{");
 
-			encodeNonEscapedObject(responseWriter, "dateClick", StringPool.BLANK, true);
+			encodeNonEscapedObject(responseWriter, "dateClick", "", true);
 			responseWriter.write("function(event){");
 
 			String clientId = inputDate.getClientId(facesContext);
@@ -209,18 +205,18 @@ public class InputDateRenderer extends InputDateRendererBase {
 				// attached to the input.
 				String datePattern = inputDate.getPattern();
 				String mask = getMaskFromDatePattern(datePattern);
-				String escapedMask = RendererUtil.escapeJavaScript(mask);
+				String escapedMask = escapeJavaScript(mask);
 				date = new JavaScriptFragment("A.Date.format(event.date,{format:'".concat(escapedMask).concat("'})"));
 			}
 
 			encodeFunctionCall(responseWriter, "LFAI.inputDateTimePickerSelect", 'A', escapedInputClientId, selectable,
 				date, valueChangeClientBehaviorsNotEmpty);
 			responseWriter.append(";}");
-			responseWriter.write(StringPool.CLOSE_CURLY_BRACE);
+			responseWriter.write("}");
 			calendarFirst = false;
 		}
 
-		responseWriter.write(StringPool.CLOSE_CURLY_BRACE);
+		responseWriter.write("}");
 	}
 
 	protected void encodeDate(ResponseWriter responseWriter, InputDate inputDate, String attributeName,
@@ -248,7 +244,7 @@ public class InputDateRenderer extends InputDateRendererBase {
 				BrowserSnifferFactory.class);
 		BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(facesContext.getExternalContext());
 
-		if (!(browserSniffer.isMobile() && inputDate.isResponsive())) {
+		if (!isNative(browserSniffer, inputDate)) {
 
 			encodeCalendar(facesContext, responseWriter, inputDate, first);
 			first = false;
@@ -276,7 +272,7 @@ public class InputDateRenderer extends InputDateRendererBase {
 		BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(facesContext.getExternalContext());
 		InputDate inputDate = (InputDate) uiComponent;
 
-		if (browserSniffer.isMobile() && inputDate.isResponsive()) {
+		if (isNative(browserSniffer, inputDate)) {
 			alloyClassName = alloyClassName.concat("Native");
 		}
 
@@ -290,8 +286,8 @@ public class InputDateRenderer extends InputDateRendererBase {
 
 	@Override
 	protected InputDateTimeResponseWriter getInputDateTimeResponseWriter(ResponseWriter responseWriter,
-		String inputClientId, boolean mobile, boolean responsive) {
-		return new InputDateResponseWriter(responseWriter, StringPool.INPUT, inputClientId, mobile, responsive);
+		String inputClientId, boolean nativeInputDate) {
+		return new InputDateResponseWriter(responseWriter, inputClientId, nativeInputDate);
 	}
 
 	@Override

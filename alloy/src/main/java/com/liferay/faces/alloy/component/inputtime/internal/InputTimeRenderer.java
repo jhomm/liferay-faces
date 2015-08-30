@@ -35,15 +35,11 @@ import javax.faces.render.FacesRenderer;
 
 import com.liferay.faces.alloy.component.inputdatetime.InputDateTime;
 import com.liferay.faces.alloy.component.inputdatetime.internal.InputDateTimeResponseWriter;
-import com.liferay.faces.alloy.component.inputtext.InputText;
 import com.liferay.faces.alloy.component.inputtime.InputTime;
+import com.liferay.faces.alloy.render.internal.JavaScriptFragment;
 import com.liferay.faces.util.client.BrowserSniffer;
 import com.liferay.faces.util.client.BrowserSnifferFactory;
-import com.liferay.faces.util.component.ComponentUtil;
 import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.js.JavaScriptFragment;
-import com.liferay.faces.util.lang.StringPool;
-import com.liferay.faces.util.render.RendererUtil;
 
 
 /**
@@ -74,8 +70,8 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 		String mask = timePattern;
 
 		mask = mask.replaceAll("%", "%%");
-		mask = mask.replaceAll(StringPool.NEW_LINE, "%n");
-		mask = mask.replaceAll(StringPool.TAB, "%t");
+		mask = mask.replaceAll("\n", "%n");
+		mask = mask.replaceAll("\t", "%t");
 
 		mask = mask.replaceAll("HH", TOKEN_REGEX);
 		mask = mask.replaceAll("H", "%k");
@@ -120,7 +116,7 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 			throw new ParseException("TimeStamp must be of the form \"HH:mm:ss\".", errorOffset);
 		}
 
-		String[] timeStampArray = timeStamp.split(StringPool.COLON);
+		String[] timeStampArray = timeStamp.split(":");
 		int hours = Integer.parseInt(timeStampArray[0]);
 		int minutes = Integer.parseInt(timeStampArray[1]);
 		int seconds = Integer.parseInt(timeStampArray[2]);
@@ -132,7 +128,7 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 	public void encodeJavaScriptCustom(FacesContext facesContext, UIComponent uiComponent) throws IOException {
 
 		InputTime inputTime = (InputTime) uiComponent;
-		String clientVarName = ComponentUtil.getClientVarName(facesContext, inputTime);
+		String clientVarName = getClientVarName(facesContext, inputTime);
 		String clientKey = inputTime.getClientKey();
 
 		if (clientKey == null) {
@@ -145,7 +141,7 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 				BrowserSnifferFactory.class);
 		BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(facesContext.getExternalContext());
 
-		if (browserSniffer.isMobile() && inputTime.isResponsive()) {
+		if (isNative(browserSniffer, inputTime)) {
 
 			JavaScriptFragment liferayComponent = new JavaScriptFragment("Liferay.component('" + clientKey + "')");
 			String clientId = uiComponent.getClientId(facesContext);
@@ -192,7 +188,7 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 			String timePattern = inputTime.getPattern();
 			Object objectLocale = inputTime.getLocale();
 			Locale locale = inputTime.getObjectAsLocale(objectLocale);
-			TimeZone timeZone = TimeZone.getTimeZone(InputDateTime.GREENWICH);
+			TimeZone timeZone = TimeZone.getTimeZone("Greenwich");
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(timePattern, locale);
 			simpleDateFormat.setTimeZone(timeZone);
 
@@ -208,7 +204,7 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 			for (long milliseconds = minTime; milliseconds <= maxTime; milliseconds = milliseconds + millisecondStep) {
 
 				if (!firstTimeStamp) {
-					responseWriter.write(StringPool.COMMA);
+					responseWriter.write(",");
 				}
 				else {
 					firstTimeStamp = false;
@@ -216,11 +212,11 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 
 				Date time = new Date(milliseconds);
 				String dateString = simpleDateFormat.format(time);
-				String escapedDateString = RendererUtil.escapeJavaScript(dateString);
+				String escapedDateString = escapeJavaScript(dateString);
 
-				responseWriter.write(StringPool.APOSTROPHE);
+				responseWriter.write("'");
 				responseWriter.write(escapedDateString);
-				responseWriter.write(StringPool.APOSTROPHE);
+				responseWriter.write("'");
 			}
 
 			responseWriter.write("]);");
@@ -230,8 +226,8 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 	protected void encodeAutocomplete(FacesContext facesContext, ResponseWriter responseWriter, InputTime inputTime,
 		boolean first) throws IOException {
 
-		encodeNonEscapedObject(responseWriter, "autocomplete", StringPool.BLANK, first);
-		responseWriter.write(StringPool.OPEN_CURLY_BRACE);
+		encodeNonEscapedObject(responseWriter, "autocomplete", "", first);
+		responseWriter.write("{");
 
 		boolean autoCompleteFirst = true;
 		boolean activateFirstItem = inputTime.isActivateFirstItem();
@@ -296,10 +292,10 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 
 		if (showOnButton || valueChangeClientBehaviorsNotEmpty) {
 
-			encodeNonEscapedObject(responseWriter, "after", StringPool.BLANK, autoCompleteFirst);
-			responseWriter.write(StringPool.OPEN_CURLY_BRACE);
+			encodeNonEscapedObject(responseWriter, "after", "", autoCompleteFirst);
+			responseWriter.write("{");
 
-			encodeNonEscapedObject(responseWriter, "select", StringPool.BLANK, true);
+			encodeNonEscapedObject(responseWriter, "select", "", true);
 			responseWriter.write("function(event){");
 
 			String clientId = inputTime.getClientId(facesContext);
@@ -315,11 +311,11 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 			encodeFunctionCall(responseWriter, "LFAI.inputDateTimePickerSelect", 'A', escapedInputClientId, selectable,
 				time, valueChangeClientBehaviorsNotEmpty);
 			responseWriter.append(";}");
-			responseWriter.write(StringPool.CLOSE_CURLY_BRACE);
+			responseWriter.write("}");
 			autoCompleteFirst = false;
 		}
 
-		responseWriter.write(StringPool.CLOSE_CURLY_BRACE);
+		responseWriter.write("}");
 	}
 
 	@Override
@@ -330,7 +326,7 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 				BrowserSnifferFactory.class);
 		BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(facesContext.getExternalContext());
 
-		if (!(browserSniffer.isMobile() && inputTime.isResponsive())) {
+		if (!isNative(browserSniffer, inputTime)) {
 
 			encodeAutocomplete(facesContext, responseWriter, inputTime, first);
 			first = false;
@@ -357,7 +353,7 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 		BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(facesContext.getExternalContext());
 		InputTime inputTime = (InputTime) uiComponent;
 
-		if (browserSniffer.isMobile() && inputTime.isResponsive()) {
+		if (isNative(browserSniffer, inputTime)) {
 			alloyClassName = alloyClassName.concat("Native");
 		}
 
@@ -371,8 +367,8 @@ public class InputTimeRenderer extends InputTimeRendererBase {
 
 	@Override
 	protected InputDateTimeResponseWriter getInputDateTimeResponseWriter(ResponseWriter responseWriter,
-		String inputClientId, boolean mobile, boolean responsive) {
-		return new InputTimeResponseWriter(responseWriter, StringPool.INPUT, inputClientId, mobile, responsive);
+		String inputClientId, boolean nativeInputTime) {
+		return new InputTimeResponseWriter(responseWriter, inputClientId, nativeInputTime);
 	}
 
 	@Override

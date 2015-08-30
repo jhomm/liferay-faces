@@ -26,6 +26,7 @@ import javax.faces.component.UICommand;
 import javax.faces.component.UISelectOne;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.FacesEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.DataModel;
@@ -35,11 +36,9 @@ import com.liferay.faces.alloy.component.datatable.RowDeselectEvent;
 import com.liferay.faces.alloy.component.datatable.RowDeselectRangeEvent;
 import com.liferay.faces.alloy.component.datatable.RowSelectEvent;
 import com.liferay.faces.alloy.component.datatable.RowSelectRangeEvent;
-import com.liferay.faces.demos.comparator.CustomerComparator;
 import com.liferay.faces.demos.dto.Customer;
+import com.liferay.faces.demos.model.CustomerOnDemandDataModel;
 import com.liferay.faces.demos.service.CustomerService;
-import com.liferay.faces.util.model.OnDemandDataModel;
-import com.liferay.faces.util.model.SortCriterion;
 
 
 /**
@@ -54,7 +53,7 @@ public class DataTableBacking implements Serializable {
 
 	// Injections
 	@ManagedProperty(value = "#{customerService}")
-	private CustomerService customerService;
+	private transient CustomerService customerService;
 
 	// Private Data Members
 	private List<Customer> customerDataModel;
@@ -117,20 +116,32 @@ public class DataTableBacking implements Serializable {
 		customerDataTable.setSelectedRowIndexes(null);
 	}
 
-	public void rowDeselectListener(RowDeselectEvent rowDeselectEvent) {
+	public void rowDeselectListener(AjaxBehaviorEvent ajaxBehaviorEvent) {
+
+		// When using JSF 2.2, this cast is unnecessary, and the method can take the RowDeselectEvent directly.
+		RowDeselectEvent rowDeselectEvent = (RowDeselectEvent) ajaxBehaviorEvent;
 		addFacesMessage(rowDeselectEvent, rowDeselectEvent.getRowIndex(), (Customer) rowDeselectEvent.getRowData());
 	}
 
-	public void rowDeselectRangeListener(RowDeselectRangeEvent rowDeselectRangeEvent) {
+	public void rowDeselectRangeListener(AjaxBehaviorEvent ajaxBehaviorEvent) {
+
+		// When using JSF 2.2, this cast is unnecessary, and the method can take the RowDeselectRangeEvent directly.
+		RowDeselectRangeEvent rowDeselectRangeEvent = (RowDeselectRangeEvent) ajaxBehaviorEvent;
 		addFacesMessage(rowDeselectRangeEvent, rowDeselectRangeEvent.getRowIndexes(),
 			rowDeselectRangeEvent.getRowDataList());
 	}
 
-	public void rowSelectListener(RowSelectEvent rowSelectEvent) {
+	public void rowSelectListener(AjaxBehaviorEvent ajaxBehaviorEvent) {
+
+		// When using JSF 2.2, this cast is unnecessary, and the method can take the RowSelectEvent directly.
+		RowSelectEvent rowSelectEvent = (RowSelectEvent) ajaxBehaviorEvent;
 		addFacesMessage(rowSelectEvent, rowSelectEvent.getRowIndex(), (Customer) rowSelectEvent.getRowData());
 	}
 
-	public void rowSelectRangeListener(RowSelectRangeEvent rowSelectRangeEvent) {
+	public void rowSelectRangeListener(AjaxBehaviorEvent ajaxBehaviorEvent) {
+
+		// When using JSF 2.2, this cast is unnecessary, and the method can take the RowSelectRangeEvent directly.
+		RowSelectRangeEvent rowSelectRangeEvent = (RowSelectRangeEvent) ajaxBehaviorEvent;
 		addFacesMessage(rowSelectRangeEvent, rowSelectRangeEvent.getRowIndexes(), rowSelectRangeEvent.getRowDataList());
 	}
 
@@ -201,34 +212,7 @@ public class DataTableBacking implements Serializable {
 	public DataModel getCustomerOnDemandDataModel() {
 
 		if (customerOnDemandDataModel == null) {
-
-			customerOnDemandDataModel = new OnDemandDataModel<Customer>() {
-
-					@Override
-					public int getRowsPerPage() {
-						return DataTableBacking.this.getRowsPerPage();
-					}
-
-					@Override
-					public int countRows() {
-						return customerService.getCustomerCount();
-					}
-
-					@Override
-					public List<Customer> findRows(int startRow, int finishRow, List<SortCriterion> sortCriteria) {
-
-						CustomerComparator customerComparator = new CustomerComparator(sortCriteria);
-						List<Customer> customers = customerService.getCustomers(startRow, finishRow,
-								customerComparator);
-
-						FacesMessage facesMessage = new FacesMessage("OnDemandDataModel: Fetched row index range " +
-								startRow + "-" + finishRow);
-						FacesContext facesContext = FacesContext.getCurrentInstance();
-						facesContext.addMessage(null, facesMessage);
-
-						return customers;
-					}
-				};
+			customerOnDemandDataModel = new CustomerOnDemandDataModel();
 		}
 
 		return customerOnDemandDataModel;

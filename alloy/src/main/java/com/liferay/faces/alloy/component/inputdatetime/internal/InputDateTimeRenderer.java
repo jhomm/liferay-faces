@@ -36,10 +36,8 @@ import com.liferay.faces.alloy.component.inputdatetime.InputDateTime;
 import com.liferay.faces.util.client.BrowserSniffer;
 import com.liferay.faces.util.client.BrowserSnifferFactory;
 import com.liferay.faces.util.component.ClientComponent;
-import com.liferay.faces.util.component.ComponentUtil;
 import com.liferay.faces.util.component.Styleable;
 import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.render.RendererUtil;
 
 
@@ -66,10 +64,10 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 		// Start the encoding of the outermost <div> element.
 		ResponseWriter responseWriter = facesContext.getResponseWriter();
 		String clientId = uiComponent.getClientId(facesContext);
-		responseWriter.startElement(StringPool.DIV, uiComponent);
+		responseWriter.startElement("div", uiComponent);
 
 		// Encode the "id" attribute on the outermost <div> element.
-		responseWriter.writeAttribute(StringPool.ID, clientId, StringPool.ID);
+		responseWriter.writeAttribute("id", clientId, "id");
 
 		// Encode the "class" and "style" attributes on the outermost <div> element.
 		RendererUtil.encodeStyleable(responseWriter, (Styleable) uiComponent);
@@ -81,7 +79,7 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 		BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(facesContext.getExternalContext());
 		InputDateTime inputDateTime = (InputDateTime) uiComponent;
 		InputDateTimeResponseWriter inputDateTimeResponseWriter = getInputDateTimeResponseWriter(responseWriter,
-				inputClientId, browserSniffer.isMobile(), inputDateTime.isResponsive());
+				inputClientId, isNative(browserSniffer, inputDateTime));
 		super.encodeMarkupBegin(facesContext, uiComponent, inputDateTimeResponseWriter);
 	}
 
@@ -95,10 +93,8 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 				BrowserSnifferFactory.class);
 		BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(facesContext.getExternalContext());
 		InputDateTime inputDateTime = (InputDateTime) uiComponent;
-		boolean mobile = browserSniffer.isMobile();
-		boolean responsive = inputDateTime.isResponsive();
 		InputDateTimeResponseWriter inputDateTimeResponseWriter = getInputDateTimeResponseWriter(responseWriter,
-				inputClientId, mobile, responsive);
+				inputClientId, isNative(browserSniffer, inputDateTime));
 		super.encodeMarkupEnd(facesContext, uiComponent, inputDateTimeResponseWriter);
 
 		// Determine whether or not the text input is enabled.
@@ -108,7 +104,7 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 		// for a mobile browser, then render the button.
 		String showOn = inputDateTime.getShowOn();
 
-		if (("both".equals(showOn) || "button".equals(showOn)) && !(mobile && responsive)) {
+		if (("both".equals(showOn) || "button".equals(showOn)) && !isNative(browserSniffer, inputDateTime)) {
 			ApplicationFactory applicationFactory = (ApplicationFactory) FactoryFinder.getFactory(
 					FactoryFinder.APPLICATION_FACTORY);
 			Application application = applicationFactory.getApplication();
@@ -148,20 +144,20 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 		// If the component is enabled, then create the boundingBox and contentBox of the picker.
 		if (!disabled) {
 
-			responseWriter.startElement(StringPool.DIV, uiComponent);
+			responseWriter.startElement("div", uiComponent);
 
 			String boundingBoxClientId = clientId.concat(BOUNDING_BOX_SUFFIX);
-			responseWriter.writeAttribute(StringPool.ID, boundingBoxClientId, null);
-			responseWriter.startElement(StringPool.DIV, uiComponent);
+			responseWriter.writeAttribute("id", boundingBoxClientId, null);
+			responseWriter.startElement("div", uiComponent);
 
 			String contentBoxClientId = clientId.concat(CONTENT_BOX_SUFFIX);
-			responseWriter.writeAttribute(StringPool.ID, contentBoxClientId, null);
-			responseWriter.endElement(StringPool.DIV);
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.writeAttribute("id", contentBoxClientId, null);
+			responseWriter.endElement("div");
+			responseWriter.endElement("div");
 		}
 
 		// Finish the encoding of the outermost </div> element.
-		responseWriter.endElement(StringPool.DIV);
+		responseWriter.endElement("div");
 	}
 
 	protected void encodeHiddenAttributesInputDateTime(FacesContext facesContext, ResponseWriter responseWriter,
@@ -190,8 +186,8 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 
 		// The popover attribute value provides the opportunity to specify a zIndex key:value pair via JSON
 		// syntax. For example: "popover: {zIndex: 1}"
-		encodeNonEscapedObject(responseWriter, "popover", StringPool.BLANK, first);
-		responseWriter.write(StringPool.OPEN_CURLY_BRACE);
+		encodeNonEscapedObject(responseWriter, "popover", "", first);
+		responseWriter.write("{");
 
 		Integer zIndex = inputDateTime.getzIndex();
 		String zIndexString;
@@ -215,7 +211,7 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 		String contentBoxClientId = clientId.concat(CONTENT_BOX_SUFFIX);
 		encodeClientId(responseWriter, CONTENT_BOX, contentBoxClientId, popoverFirst);
 		popoverFirst = false;
-		responseWriter.write(StringPool.CLOSE_CURLY_BRACE);
+		responseWriter.write("}");
 	}
 
 	protected String getButtonClientId(FacesContext facesContext, ClientComponent clientComponent) {
@@ -225,12 +221,12 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 		// button's clientId and ensure that it is unique. However, UIComponent.setId() throws an
 		// IllegalArgumentException if the id contains colons. To workaround this, the colons must be
 		// replaced by underscores using ComponentUtil.getClientVarName().
-		String inputDateClientVarName = ComponentUtil.getClientVarName(facesContext, clientComponent);
+		String inputDateClientVarName = getClientVarName(facesContext, clientComponent);
 
 		// The JSF runtime's renderer does not write ids which are prefixed with
 		// UIViewRoot.UNIQUE_ID_PREFIX ("j_id"). Therefore, prefix the id with an underscore in order to
 		// force the the JSF runtime's renderer to write the id.
-		return StringPool.UNDERLINE + inputDateClientVarName + BUTTON_SUFFIX;
+		return "_" + inputDateClientVarName + BUTTON_SUFFIX;
 	}
 
 	protected abstract String getButtonIconName();
@@ -249,8 +245,12 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 		return !locale.equals(viewRootLocale);
 	}
 
+	protected boolean isNative(BrowserSniffer browserSniffer, InputDateTime inputDateTime) {
+		return browserSniffer.isMobile() && inputDateTime.isNativeWhenMobile();
+	}
+
 	protected abstract InputDateTimeResponseWriter getInputDateTimeResponseWriter(ResponseWriter responseWriter,
-		String inputClientId, boolean mobile, boolean responsive);
+		String inputClientId, boolean nativeInputDateTime);
 
 	protected abstract List<String> getModules(List<String> modules, FacesContext facesContext,
 		InputDateTime inputDateTime);
@@ -262,9 +262,8 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 				BrowserSnifferFactory.class);
 		BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(facesContext.getExternalContext());
 		InputDateTime inputDateTime = (InputDateTime) uiComponent;
-		boolean responsive = inputDateTime.isResponsive();
 
-		if (browserSniffer.isMobile() && responsive) {
+		if (isNative(browserSniffer, inputDateTime)) {
 			String nativeAlloyModuleName = defaultModules[0].concat("-native");
 			modules.add(nativeAlloyModuleName);
 		}
@@ -293,18 +292,15 @@ public abstract class InputDateTimeRenderer extends InputDateTimeRendererBase {
 		Locale locale = inputDateTime.getObjectAsLocale(inputDateTime.getLocale(facesContext));
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(StringPool.OPEN_CURLY_BRACE);
-		stringBuilder.append("lang");
-		stringBuilder.append(StringPool.COLON);
+		stringBuilder.append("{lang:");
 
 		// RFC 1766 requires the subtags of locales to be delimited by hyphens rather than underscores.
 		// http://www.faqs.org/rfcs/rfc1766.html
-		stringBuilder.append(StringPool.APOSTROPHE);
+		stringBuilder.append("'");
 
-		String localeString = locale.toString().replaceAll(StringPool.UNDERLINE, StringPool.DASH);
+		String localeString = locale.toString().replaceAll("_", "-");
 		stringBuilder.append(localeString);
-		stringBuilder.append(StringPool.APOSTROPHE);
-		stringBuilder.append(StringPool.CLOSE_CURLY_BRACE);
+		stringBuilder.append("'}");
 
 		return stringBuilder.toString();
 	}

@@ -28,7 +28,7 @@ public abstract class SelectManyListboxBase extends HtmlSelectManyListbox implem
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.selectmanylistbox.SelectManyListbox";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectmanylistbox.internal.SelectManyListboxRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectmanylistbox.SelectManyListboxRenderer";
 
 	// Protected Enumerations
 	protected enum SelectManyListboxPropertyKeys {
@@ -38,6 +38,23 @@ public abstract class SelectManyListboxBase extends HtmlSelectManyListbox implem
 	public SelectManyListboxBase() {
 		super();
 		setRendererType(RENDERER_TYPE);
+	}
+
+	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
 	}
 
 	@Override

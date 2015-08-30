@@ -13,18 +13,11 @@
  */
 package com.liferay.faces.bridge.bean.internal;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.portlet.faces.annotation.BridgePreDestroy;
-
 import com.liferay.faces.util.config.ConfiguredManagedBean;
-import com.liferay.faces.util.lang.StringPool;
-import com.liferay.faces.util.logging.Logger;
-import com.liferay.faces.util.logging.LoggerFactory;
 
 
 /**
@@ -33,12 +26,7 @@ import com.liferay.faces.util.logging.LoggerFactory;
 public class BeanManagerImpl extends BeanManagerCompatImpl {
 
 	// Private Constants
-	private static final String JAVAX_ANNOTATION_PRE_DESTROY = "javax.annotation.PreDestroy";
-	private static final String JAVAX_ANNOTATION_BRIDGE_PRE_DESTROY = "javax.portlet.faces.annotation.BridgePreDestroy";
 	private static final String JAVAX_PORTLET_P = "javax.portlet.p.";
-
-	// Logger
-	private static final Logger logger = LoggerFactory.getLogger(BeanManagerImpl.class);
 
 	// Private Data Members
 	private Map<String, ConfiguredManagedBean> configuredManagedBeanSet;
@@ -53,113 +41,6 @@ public class BeanManagerImpl extends BeanManagerCompatImpl {
 				this.configuredManagedBeanSet.put(configuredManagedBean.getManagedBeanName(), configuredManagedBean);
 			}
 		}
-	}
-
-	public void invokePreDestroyMethods(Object managedBean, boolean preferPreDestroy) {
-
-		if (managedBean != null) {
-
-			Class<?> clazz = managedBean.getClass();
-			Method[] methods = managedBean.getClass().getMethods();
-
-			if (methods != null) {
-
-				for (Method method : methods) {
-
-					if (preferPreDestroy) {
-
-						if (hasPreDestroyAnnotation(method)) {
-
-							try {
-								logger.debug("Invoking @PreDestroy method named [{0}] on managedBean class=[{1}]",
-									method.getName(), clazz.getName());
-								method.invoke(managedBean, new Object[] {});
-							}
-							catch (Exception e) {
-								logger.error(e.getMessage(), e);
-							}
-						}
-					}
-					else {
-
-						if (hasBridgePreDestroyAnnotation(method)) {
-
-							try {
-								logger.debug("Invoking @BridgePreDestroy method named [{0}] on managedBean class=[{1}]",
-									method.getName(), clazz.getName());
-								method.invoke(managedBean, new Object[] {});
-							}
-							catch (Exception e) {
-								logger.error(e.getMessage(), e);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Determines whether or not the specified method is annotated with the {@link BridgePreDestroy} annotation. Note
-	 * that the method signature must also have a void return type an zero parameters in order for this method to return
-	 * true.
-	 *
-	 * @param   method  The method to check.
-	 *
-	 * @return  true if the specified method is annotated with a PreDestroy annotation.
-	 */
-	protected boolean hasBridgePreDestroyAnnotation(Method method) {
-
-		if (method.getReturnType() == Void.TYPE) {
-			Class<?>[] parameterTypes = method.getParameterTypes();
-
-			if ((parameterTypes == null) || (parameterTypes.length == 0)) {
-				Annotation[] annotations = method.getAnnotations();
-
-				if (annotations != null) {
-
-					for (Annotation annotation : annotations) {
-
-						if (annotation.annotationType().getName().equals(JAVAX_ANNOTATION_BRIDGE_PRE_DESTROY)) {
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Determines whether or not the specified method is annotated with the {@link PreDestroy} annotation. Note that the
-	 * method signature must also have a void return type an zero parameters in order for this method to return true.
-	 *
-	 * @param   method  The method to check.
-	 *
-	 * @return  true if the specified method is annotated with a PreDestroy annotation.
-	 */
-	protected boolean hasPreDestroyAnnotation(Method method) {
-
-		if (method.getReturnType() == Void.TYPE) {
-			Class<?>[] parameterTypes = method.getParameterTypes();
-
-			if ((parameterTypes == null) || (parameterTypes.length == 0)) {
-				Annotation[] annotations = method.getAnnotations();
-
-				if (annotations != null) {
-
-					for (Annotation annotation : annotations) {
-
-						if (annotation.annotationType().getName().equals(JAVAX_ANNOTATION_PRE_DESTROY)) {
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		return false;
 	}
 
 	public boolean isManagedBean(String name, Object value) {
@@ -180,7 +61,7 @@ public class BeanManagerImpl extends BeanManagerCompatImpl {
 					// "javax.portlet.p.<ID>?" pattern. In order to determine if the specified name is a SessionScoped
 					// managed-bean, it is necessary to first strip the pattern from it.
 					if (name.startsWith(JAVAX_PORTLET_P)) {
-						int pos = name.indexOf(StringPool.QUESTION);
+						int pos = name.indexOf("?");
 
 						if (pos > 0) {
 							name = name.substring(pos + 1);

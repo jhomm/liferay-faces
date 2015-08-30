@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test;
+//J-
 
 import java.util.logging.Logger;
 
@@ -21,10 +22,10 @@ import org.openqa.selenium.WebElement;
 import com.liferay.faces.test.util.TesterBase;
 
 /**
- * @author  Liferay Faces Team
+ * @author	Liferay Faces Team
  */
 public class Icefaces4 extends TesterBase {
-	
+
 	protected static final Logger logger = Logger.getLogger(Icefaces4.class.getName());
 
 	// form tag found after submitting
@@ -65,7 +66,7 @@ public class Icefaces4 extends TesterBase {
 	private static final String provinceIdFieldErrorXpath = "//select[contains(@id,':provinceId')]/following-sibling::*[1]";
 
 	private static final String provinceIdSelectorXpath = "";
-	
+
 	private static final String postalCodeFieldXpath = "//input[contains(@id,':postalCode_input')]";
 	private static final String postalCodeFieldErrorXpath = "//input[contains(@id,':postalCode_input')]/../../following-sibling::*[1]/following-sibling::*[1]";
 
@@ -89,8 +90,9 @@ public class Icefaces4 extends TesterBase {
 	private static final String alloyVersionXpath = "//*[contains(text(),'Liferay Faces Alloy')]";
 	private static final String bridgeVersionXpath = "//*[contains(text(),'Liferay Faces Bridge')]";
 
-	// xpath for specific tests
-	protected static final String dateValidationXpath = "//input[contains(@id,':dateOfBirth')]/../following-sibling::*[1]/child::node()";
+	private static final String versionUlXpath = "//*[contains(text(),'Liferay Faces Bridge')]/../../../../ul";
+	private static final String windowInnerHeightXpath = "//em[@id='window.innerHeight']";
+	private static final String windowInnerWidthXpath = "//em[@id='window.innerWidth']";
 
 	static final String url = baseUrl + webContext + "/ice4";
 
@@ -172,7 +174,6 @@ public class Icefaces4 extends TesterBase {
 	private WebElement alloyVersion;
 	@FindBy(xpath = bridgeVersionXpath)
 	private WebElement bridgeVersion;
-	
-	protected int dateValidationXpathModifier = 0;
 
 }
+//J+

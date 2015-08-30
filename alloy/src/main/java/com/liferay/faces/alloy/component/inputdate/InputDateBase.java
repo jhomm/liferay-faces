@@ -29,30 +29,21 @@ public abstract class InputDateBase extends InputDateTime implements Styleable, 
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.inputdate.InputDate";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputdate.internal.InputDateRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputdate.InputDateRenderer";
 
 	// Protected Enumerations
 	protected enum InputDatePropertyKeys {
-		dateSelectListener,
 		maxDate,
 		minDate,
+		nativeWhenMobile,
 		panes,
 		pattern,
-		responsive,
 		styleClass
 	}
 
 	public InputDateBase() {
 		super();
 		setRendererType(RENDERER_TYPE);
-	}
-
-	public javax.el.MethodExpression getDateSelectListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(InputDatePropertyKeys.dateSelectListener, null);
-	}
-
-	public void setDateSelectListener(javax.el.MethodExpression dateSelectListener) {
-		getStateHelper().put(InputDatePropertyKeys.dateSelectListener, dateSelectListener);
 	}
 
 	public Object getMaxDate() {
@@ -71,6 +62,14 @@ public abstract class InputDateBase extends InputDateTime implements Styleable, 
 		getStateHelper().put(InputDatePropertyKeys.minDate, minDate);
 	}
 
+	public boolean isNativeWhenMobile() {
+		return (Boolean) getStateHelper().eval(InputDatePropertyKeys.nativeWhenMobile, true);
+	}
+
+	public void setNativeWhenMobile(boolean nativeWhenMobile) {
+		getStateHelper().put(InputDatePropertyKeys.nativeWhenMobile, nativeWhenMobile);
+	}
+
 	public Integer getPanes() {
 		return (Integer) getStateHelper().eval(InputDatePropertyKeys.panes, null);
 	}
@@ -85,14 +84,6 @@ public abstract class InputDateBase extends InputDateTime implements Styleable, 
 
 	public void setPattern(String pattern) {
 		getStateHelper().put(InputDatePropertyKeys.pattern, pattern);
-	}
-
-	public boolean isResponsive() {
-		return (Boolean) getStateHelper().eval(InputDatePropertyKeys.responsive, true);
-	}
-
-	public void setResponsive(boolean responsive) {
-		getStateHelper().put(InputDatePropertyKeys.responsive, responsive);
 	}
 
 	@Override

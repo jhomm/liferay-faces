@@ -25,7 +25,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.liferay.faces.bridge.renderkit.html_basic.internal.HeadResource;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -50,8 +49,8 @@ public class LiferaySharedPageTop {
 
 	// FACES-1442: The SAXParserFactory.newSAXParser() method that comes with the JRE suffers from a
 	// performance problem. Use the Liferay factory intead.
-	private static final com.liferay.faces.util.xml.SAXParserFactory saxParserFactory =
-		com.liferay.faces.util.xml.SAXParserFactory.newInstance();
+	private static final javax.xml.parsers.SAXParserFactory saxParserFactory =
+		com.liferay.faces.util.xml.ConcurrentSAXParserFactory.newInstance();
 
 	// Private Data Members
 	private List<HeadResource> headResources;
@@ -64,14 +63,13 @@ public class LiferaySharedPageTop {
 			SharedPageTopHandler sharedPageTopHandler = new SharedPageTopHandler();
 			StringBundler xmlDocument = new StringBundler();
 			xmlDocument.append(XML_DOCUMENT_DECLARATION);
-			xmlDocument.append(StringPool.LESS_THAN);
+			xmlDocument.append("<");
 			xmlDocument.append(WebKeys.PAGE_TOP);
-			xmlDocument.append(StringPool.GREATER_THAN);
+			xmlDocument.append(">");
 			xmlDocument.append(stringBundler);
-			xmlDocument.append(StringPool.LESS_THAN);
-			xmlDocument.append(StringPool.FORWARD_SLASH);
+			xmlDocument.append("</");
 			xmlDocument.append(WebKeys.PAGE_TOP);
-			xmlDocument.append(StringPool.GREATER_THAN);
+			xmlDocument.append(">");
 
 			String xmlDocumentAsString = xmlDocument.toString();
 
@@ -141,7 +139,7 @@ public class LiferaySharedPageTop {
 
 		String encodedValue = value;
 
-		int ampersandPos = value.indexOf(StringPool.AMPERSAND);
+		int ampersandPos = value.indexOf("&");
 
 		if (ampersandPos > 0) {
 
@@ -151,11 +149,11 @@ public class LiferaySharedPageTop {
 			while (ampersandPos > 0) {
 
 				buf.append(value.substring(startPos, ampersandPos));
-				buf.append(StringPool.AMPERSAND_ENCODED);
+				buf.append("&amp;");
 
 				startPos = ampersandPos + 1;
 
-				ampersandPos = value.indexOf(StringPool.AMPERSAND, startPos);
+				ampersandPos = value.indexOf("&", startPos);
 			}
 
 			if (startPos < value.length()) {

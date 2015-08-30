@@ -29,9 +29,7 @@ import javax.portlet.faces.Bridge;
 import com.liferay.faces.bridge.context.BridgeContext;
 import com.liferay.faces.bridge.context.url.BridgeResourceURL;
 import com.liferay.faces.bridge.context.url.BridgeURI;
-import com.liferay.faces.util.application.ResourceConstants;
 import com.liferay.faces.util.helper.BooleanHelper;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -68,11 +66,11 @@ public class BridgeResourceURLImpl extends BridgeURLBase implements BridgeResour
 
 		String backLinkViewId = facesContext.getViewRoot().getViewId();
 		String backLinkURL = facesContext.getApplication().getViewHandler().getActionURL(facesContext, backLinkViewId);
-		String backLinkEncodedActionURL = StringPool.BLANK;
+		String backLinkEncodedActionURL = "";
 
 		try {
 			ExternalContext externalContext = facesContext.getExternalContext();
-			backLinkEncodedActionURL = URLEncoder.encode(externalContext.encodeActionURL(backLinkURL), StringPool.UTF8);
+			backLinkEncodedActionURL = URLEncoder.encode(externalContext.encodeActionURL(backLinkURL), "UTF-8");
 		}
 		catch (UnsupportedEncodingException e) {
 			logger.error(e.getMessage());
@@ -150,7 +148,7 @@ public class BridgeResourceURLImpl extends BridgeURLBase implements BridgeResour
 		}
 
 		// Otherwise, if the URL is identified by the ResourceHandler as a JSF2 resource URL, then
-		else if ((uri != null) && (uri.contains(ResourceConstants.JAVAX_FACES_RESOURCE))) {
+		else if ((uri != null) && (uri.contains("javax.faces.resource"))) {
 
 			// If the URL has already been encoded, then return the URL string unmodified.
 			if (uri.indexOf(ENCODED_RESOURCE_TOKEN) > 0) {

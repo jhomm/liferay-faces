@@ -17,18 +17,10 @@ import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.el.ELContext;
-import javax.el.ValueExpression;
-import javax.faces.application.Application;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UINamingContainer;
 import javax.faces.component.UIViewRoot;
-import javax.faces.component.ValueHolder;
 import javax.faces.component.html.HtmlOutputLabel;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-
-import com.liferay.faces.util.lang.StringPool;
 
 
 /**
@@ -40,38 +32,6 @@ public class ComponentUtil {
 	private static final String DOUBLE_BACKSLASH_COLON = "\\\\\\\\:";
 	private static final String REGEX_COLON = "[:]";
 
-	public static String appendToCssClasses(String cssClass, String suffix) {
-
-		String value = cssClass;
-
-		if (value != null) {
-			value = value.trim();
-
-			if (value.length() > 0) {
-				StringBuilder buf = new StringBuilder();
-				String[] cssClasses = cssClass.trim().split(StringPool.SPACE);
-				boolean firstClass = true;
-
-				for (String curCssClass : cssClasses) {
-
-					if (firstClass) {
-						firstClass = false;
-					}
-					else {
-						buf.append(StringPool.SPACE);
-					}
-
-					buf.append(curCssClass);
-					buf.append(suffix);
-				}
-
-				value = buf.toString();
-			}
-		}
-
-		return value;
-	}
-
 	public static String concatCssClasses(String... classNames) {
 
 		StringBuilder cssClassBuilder = new StringBuilder();
@@ -82,7 +42,7 @@ public class ComponentUtil {
 			if (className != null) {
 
 				if (!first) {
-					cssClassBuilder.append(StringPool.SPACE);
+					cssClassBuilder.append(" ");
 				}
 
 				cssClassBuilder.append(className);
@@ -97,42 +57,6 @@ public class ComponentUtil {
 		}
 
 		return allClasses;
-	}
-
-	public static Object convertSubmittedValue(FacesContext facesContext, ValueHolder valueHolder,
-		Object submittedValue) {
-
-		Object convertedValue = submittedValue;
-
-		if ((valueHolder != null) && (submittedValue != null)) {
-
-			UIComponent uiComponent = (UIComponent) valueHolder;
-			Converter converter = valueHolder.getConverter();
-
-			if (converter == null) {
-
-				ValueExpression valueExpression = uiComponent.getValueExpression(StringPool.VALUE);
-
-				if (valueExpression != null) {
-
-					ELContext elContext = facesContext.getELContext();
-					Class<?> converterClassType = valueExpression.getType(elContext);
-
-					if ((converterClassType != null) && !converterClassType.equals(Object.class)) {
-
-						Application application = facesContext.getApplication();
-						converter = application.createConverter(converterClassType);
-					}
-				}
-			}
-
-			if (converter != null) {
-				String submittedValueAsString = submittedValue.toString();
-				convertedValue = converter.getAsObject(facesContext, uiComponent, submittedValueAsString);
-			}
-		}
-
-		return convertedValue;
 	}
 
 	public static String escapeClientId(String clientId) {
@@ -197,20 +121,6 @@ public class ComponentUtil {
 		}
 
 		return uiComponent;
-	}
-
-	public static UIComponent matchComponentInViewRoot(FacesContext facesContext, String partialClientId) {
-		return matchComponentInHierarchy(facesContext, facesContext.getViewRoot(), partialClientId);
-	}
-
-	public static String getClientVarName(FacesContext facesContext, ClientComponent clientComponent) {
-
-		char separatorChar = UINamingContainer.getSeparatorChar(facesContext);
-		String clientId = clientComponent.getClientId();
-		String regex = StringPool.OPEN_BRACKET + separatorChar + StringPool.CLOSE_BRACKET;
-		String clientVarName = clientId.replaceAll(regex, StringPool.UNDERLINE);
-
-		return clientVarName;
 	}
 
 	public static String getComponentLabel(UIComponent uiComponent) {

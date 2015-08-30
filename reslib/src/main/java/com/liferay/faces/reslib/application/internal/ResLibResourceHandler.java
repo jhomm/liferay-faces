@@ -29,16 +29,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.liferay.faces.reslib.config.ResLibConfigParam;
-import com.liferay.faces.util.application.ResourceConstants;
+import com.liferay.faces.util.HttpHeaders;
 import com.liferay.faces.util.application.ResourceHandlerWrapperBase;
 import com.liferay.faces.util.config.ApplicationConfig;
 import com.liferay.faces.util.config.ConfiguredServletMapping;
 import com.liferay.faces.util.config.FacesConfig;
 import com.liferay.faces.util.io.ResourceOutputStream;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.product.ProductConstants;
 import com.liferay.faces.util.product.ProductMap;
-import com.liferay.faces.util.render.HttpHeaders;
 
 
 /**
@@ -102,7 +100,7 @@ public class ResLibResourceHandler extends ResourceHandlerWrapperBase {
 		else {
 			ExternalContext externalContext = facesContext.getExternalContext();
 			Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
-			String libraryName = requestParameterMap.get(ResourceConstants.LN);
+			String libraryName = requestParameterMap.get("ln");
 
 			if (LIBRARY_NAME.equals(libraryName)) {
 
@@ -167,7 +165,7 @@ public class ResLibResourceHandler extends ResourceHandlerWrapperBase {
 
 	protected boolean validateModulePathExtensions(ExternalContext externalContext, List<String> modulePaths) {
 		String[] comboAllowedFileExtensions = ResLibConfigParam.ComboAllowedFileExtensions.getStringValue(
-				externalContext).split(StringPool.COMMA);
+				externalContext).split(",");
 
 		boolean modulePathExtensionsValid = true;
 

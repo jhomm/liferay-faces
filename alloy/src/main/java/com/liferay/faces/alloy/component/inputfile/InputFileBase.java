@@ -29,15 +29,17 @@ public abstract class InputFileBase extends HtmlInputFile implements Styleable, 
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.inputfile.InputFile";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputfile.internal.InputFileRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputfile.InputFileRenderer";
 
 	// Protected Enumerations
 	protected enum InputFilePropertyKeys {
 		appendNewFiles,
 		auto,
 		clientKey,
+		contentTypes,
 		fileUploadListener,
 		location,
+		maxFileSize,
 		multiple,
 		showPreview,
 		showProgress,
@@ -75,6 +77,14 @@ public abstract class InputFileBase extends HtmlInputFile implements Styleable, 
 		getStateHelper().put(InputFilePropertyKeys.clientKey, clientKey);
 	}
 
+	public String getContentTypes() {
+		return (String) getStateHelper().eval(InputFilePropertyKeys.contentTypes, null);
+	}
+
+	public void setContentTypes(String contentTypes) {
+		getStateHelper().put(InputFilePropertyKeys.contentTypes, contentTypes);
+	}
+
 	public javax.el.MethodExpression getFileUploadListener() {
 		return (javax.el.MethodExpression) getStateHelper().eval(InputFilePropertyKeys.fileUploadListener, null);
 	}
@@ -83,12 +93,37 @@ public abstract class InputFileBase extends HtmlInputFile implements Styleable, 
 		getStateHelper().put(InputFilePropertyKeys.fileUploadListener, fileUploadListener);
 	}
 
+	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
+	}
+
 	public String getLocation() {
 		return (String) getStateHelper().eval(InputFilePropertyKeys.location, null);
 	}
 
 	public void setLocation(String location) {
 		getStateHelper().put(InputFilePropertyKeys.location, location);
+	}
+
+	public Long getMaxFileSize() {
+		return (Long) getStateHelper().eval(InputFilePropertyKeys.maxFileSize, null);
+	}
+
+	public void setMaxFileSize(Long maxFileSize) {
+		getStateHelper().put(InputFilePropertyKeys.maxFileSize, maxFileSize);
 	}
 
 	public String getMultiple() {
@@ -121,7 +156,7 @@ public abstract class InputFileBase extends HtmlInputFile implements Styleable, 
 		// STYLE_CLASS_NAME of the super class.
 		String styleClass = (String) getStateHelper().eval(InputFilePropertyKeys.styleClass, null);
 
-		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-input-file");
+		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-input-file", "field");
 	}
 
 	@Override

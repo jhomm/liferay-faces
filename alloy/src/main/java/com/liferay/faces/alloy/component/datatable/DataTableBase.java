@@ -29,16 +29,12 @@ public abstract class DataTableBase extends HtmlDataTable implements Styleable, 
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.datatable.DataTable";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.datatable.internal.DataTableRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.datatable.DataTableRenderer";
 
 	// Protected Enumerations
 	protected enum DataTablePropertyKeys {
 		clientKey,
 		multiColumnSort,
-		rowDeselectListener,
-		rowDeselectRangeListener,
-		rowSelectListener,
-		rowSelectRangeListener,
 		selectedRowIndexes,
 		selectionMode,
 		styleClass
@@ -67,38 +63,6 @@ public abstract class DataTableBase extends HtmlDataTable implements Styleable, 
 		getStateHelper().put(DataTablePropertyKeys.multiColumnSort, multiColumnSort);
 	}
 
-	public javax.el.MethodExpression getRowDeselectListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(DataTablePropertyKeys.rowDeselectListener, null);
-	}
-
-	public void setRowDeselectListener(javax.el.MethodExpression rowDeselectListener) {
-		getStateHelper().put(DataTablePropertyKeys.rowDeselectListener, rowDeselectListener);
-	}
-
-	public javax.el.MethodExpression getRowDeselectRangeListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(DataTablePropertyKeys.rowDeselectRangeListener, null);
-	}
-
-	public void setRowDeselectRangeListener(javax.el.MethodExpression rowDeselectRangeListener) {
-		getStateHelper().put(DataTablePropertyKeys.rowDeselectRangeListener, rowDeselectRangeListener);
-	}
-
-	public javax.el.MethodExpression getRowSelectListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(DataTablePropertyKeys.rowSelectListener, null);
-	}
-
-	public void setRowSelectListener(javax.el.MethodExpression rowSelectListener) {
-		getStateHelper().put(DataTablePropertyKeys.rowSelectListener, rowSelectListener);
-	}
-
-	public javax.el.MethodExpression getRowSelectRangeListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(DataTablePropertyKeys.rowSelectRangeListener, null);
-	}
-
-	public void setRowSelectRangeListener(javax.el.MethodExpression rowSelectRangeListener) {
-		getStateHelper().put(DataTablePropertyKeys.rowSelectRangeListener, rowSelectRangeListener);
-	}
-
 	public String getSelectedRowIndexes() {
 		return (String) getStateHelper().eval(DataTablePropertyKeys.selectedRowIndexes, null);
 	}
@@ -121,7 +85,7 @@ public abstract class DataTableBase extends HtmlDataTable implements Styleable, 
 		// STYLE_CLASS_NAME of the super class.
 		String styleClass = (String) getStateHelper().eval(DataTablePropertyKeys.styleClass, null);
 
-		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-data-table");
+		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-data-table", "table table-bordered table-hover table-striped");
 	}
 
 	@Override

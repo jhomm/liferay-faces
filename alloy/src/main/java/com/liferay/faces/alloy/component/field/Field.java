@@ -27,7 +27,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 
 import com.liferay.faces.util.component.ComponentUtil;
-import com.liferay.faces.util.lang.StringPool;
 
 
 /**
@@ -43,7 +42,7 @@ public class Field extends FieldBase {
 	private static final String WARNING = "warning";
 	private static final String SUCCESS = "success";
 
-	protected List<EditableValueHolder> getEditableValueHoldersRecurse(UIComponent uiComponent) {
+	private List<EditableValueHolder> getEditableValueHoldersRecurse(UIComponent uiComponent) {
 
 		List<EditableValueHolder> editableValueHolders = null;
 
@@ -86,7 +85,7 @@ public class Field extends FieldBase {
 		return editableValueHolders;
 	}
 
-	protected FacesMessage.Severity getHighestMessageSeverityRecurse(FacesContext facesContext, UIComponent uiComponent,
+	private FacesMessage.Severity getHighestMessageSeverityRecurse(FacesContext facesContext, UIComponent uiComponent,
 		FacesMessage.Severity severity) {
 
 		List<UIComponent> children = uiComponent.getChildren();
@@ -165,6 +164,9 @@ public class Field extends FieldBase {
 							}
 						}
 					}
+					else {
+						editableValueHoldersValid = true;
+					}
 				}
 				else {
 					editableValueHoldersValid = false;
@@ -186,19 +188,19 @@ public class Field extends FieldBase {
 			PartialViewContext partialViewContext = facesContext.getPartialViewContext();
 
 			if (editableValueHoldersExist && editableValueHoldersValid && partialViewContext.isAjaxRequest()) {
-				controlGroupCssClass = controlGroupCssClass + StringPool.SPACE + SUCCESS;
+				controlGroupCssClass = controlGroupCssClass + " " + SUCCESS;
 			}
 		}
 		else {
 
 			if ((severity == FacesMessage.SEVERITY_FATAL) || (severity == FacesMessage.SEVERITY_ERROR)) {
-				controlGroupCssClass = controlGroupCssClass + StringPool.SPACE + ERROR;
+				controlGroupCssClass = controlGroupCssClass + " " + ERROR;
 			}
 			else if (severity == FacesMessage.SEVERITY_WARN) {
-				controlGroupCssClass = controlGroupCssClass + StringPool.SPACE + WARNING;
+				controlGroupCssClass = controlGroupCssClass + " " + WARNING;
 			}
 			else if (severity == FacesMessage.SEVERITY_INFO) {
-				controlGroupCssClass = controlGroupCssClass + StringPool.SPACE + INFO;
+				controlGroupCssClass = controlGroupCssClass + " " + INFO;
 			}
 		}
 

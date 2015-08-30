@@ -22,7 +22,6 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 
 import com.liferay.faces.alloy.component.fieldset.Fieldset;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.render.RendererUtil;
 
 
@@ -43,20 +42,20 @@ public class FieldsetRenderer extends FieldsetRendererBase {
 		responseWriter.startElement(FIELDSET, uiComponent);
 
 		String clientId = uiComponent.getClientId(facesContext);
-		responseWriter.writeAttribute(StringPool.ID, clientId, StringPool.ID);
-		responseWriter.writeAttribute(StringPool.NAME, clientId, StringPool.ID);
+		responseWriter.writeAttribute("id", clientId, "id");
+		responseWriter.writeAttribute("name", clientId, "id");
 
 		Fieldset fieldset = (Fieldset) uiComponent;
 
 		boolean disabled = fieldset.isDisabled();
 
 		if (disabled) {
-			responseWriter.writeAttribute(StringPool.DISABLED, Boolean.toString(disabled), StringPool.DISABLED);
+			responseWriter.writeAttribute("disabled", Boolean.toString(disabled), "disabled");
 		}
 
 		RendererUtil.encodeStyleable(responseWriter, fieldset);
-		RendererUtil.encodePassThroughAttributes(responseWriter, uiComponent, RendererUtil.KEYBOARD_DOM_EVENTS);
-		RendererUtil.encodePassThroughAttributes(responseWriter, uiComponent, RendererUtil.MOUSE_DOM_EVENTS);
+		encodePassThroughAttributes(responseWriter, uiComponent, KEYBOARD_DOM_EVENTS);
+		encodePassThroughAttributes(responseWriter, uiComponent, MOUSE_DOM_EVENTS);
 	}
 
 	@Override
@@ -69,7 +68,7 @@ public class FieldsetRenderer extends FieldsetRendererBase {
 		if (legend != null) {
 
 			responseWriter.startElement(LEGEND, uiComponent);
-			responseWriter.writeAttribute(StringPool.CLASS, LEGEND, null);
+			responseWriter.writeAttribute("class", LEGEND, null);
 			responseWriter.writeText(legend, LEGEND);
 			responseWriter.endElement(LEGEND);
 		}

@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test;
+//J-
 
 import static org.junit.Assert.assertTrue;
 
@@ -33,7 +34,7 @@ import com.liferay.faces.test.util.TesterBase;
 
 
 /**
- * @author  Liferay Faces Team
+ * @author	Liferay Faces Team
  */
 @RunWith(Arquillian.class)
 public class Jsf2LoginPortletTest extends TesterBase {
@@ -57,9 +58,9 @@ public class Jsf2LoginPortletTest extends TesterBase {
 
 	@FindBy(xpath = "//div[contains(text(),'You are signed in as')]")
 	private WebElement portletBody;
-	
+
 	static final String url = baseUrl + "/web/guest/jsf2-sign-in";
-	
+
 	@Drone
 	WebDriver browser;
 
@@ -73,7 +74,7 @@ public class Jsf2LoginPortletTest extends TesterBase {
 	@RunAsClient
 	@InSequence(1)
 	public void failToSignIn() throws Exception {
-		
+
 		logger.log(Level.INFO, "url = " + url);
 
 		browser.get(url);
@@ -139,3 +140,4 @@ public class Jsf2LoginPortletTest extends TesterBase {
 	}
 
 }
+//J+

@@ -20,7 +20,6 @@ import java.util.Set;
 
 import javax.portlet.faces.Bridge;
 
-import com.liferay.faces.bridge.internal.BridgeConstants;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -52,25 +51,48 @@ public class FacesViewParameterMap extends HashMap<String, String> implements Ma
 
 		if ((facesViewQueryString != null) && (facesViewQueryString.length() > 0)) {
 
-			String[] queryParameters = facesViewQueryString.split(BridgeConstants.REGEX_AMPERSAND_DELIMITER);
+			String[] queryParameters = facesViewQueryString.split("[&]");
 
 			for (String queryParameter : queryParameters) {
 				String[] nameValueArray = queryParameter.split("[=]");
 
 				if (nameValueArray != null) {
 
-					if (nameValueArray.length == 2) {
+					if (nameValueArray.length == 1) {
 
-						String parameterName = nameValueArray[0];
-						String parameterValue = nameValueArray[1];
+						String parameterName = nameValueArray[0].trim();
 
-						if (excludedParameterNames.contains(parameterName)) {
-							logger.debug("Excluding parameterName=[{0}]", parameterName);
+						if (parameterName.length() == 0) {
+							logger.error(
+								"Invalid name=value pair=[{0}] in facesViewQueryString=[{1}]: name cannot be empty",
+								nameValueArray, facesViewQueryString);
 						}
 						else {
-							logger.debug("Adding parameterName=[{0}] parameterValue=[{1}]", parameterName,
-								parameterValue);
-							put(parameterName, parameterValue);
+							put(parameterName, "");
+						}
+					}
+					else if (nameValueArray.length == 2) {
+
+						String parameterName = nameValueArray[0].trim();
+
+						if (parameterName.length() == 0) {
+							logger.error(
+								"Invalid name=value pair=[{0}] in facesViewQueryString=[{1}]: name cannot be empty",
+								nameValueArray, facesViewQueryString);
+						}
+						else {
+
+							String parameterValue = nameValueArray[1];
+
+							if (excludedParameterNames.contains(parameterName)) {
+								logger.debug("Excluding parameterName=[{0}]", parameterName);
+							}
+							else {
+
+								logger.debug("Adding parameterName=[{0}] parameterValue=[{1}]", parameterName,
+									parameterValue);
+								put(parameterName, parameterValue);
+							}
 						}
 					}
 					else {

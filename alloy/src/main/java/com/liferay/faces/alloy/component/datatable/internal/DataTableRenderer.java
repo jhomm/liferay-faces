@@ -47,9 +47,8 @@ import com.liferay.faces.alloy.component.datatable.RowDeselectRangeEvent;
 import com.liferay.faces.alloy.component.datatable.RowSelectEvent;
 import com.liferay.faces.alloy.component.datatable.RowSelectRangeEvent;
 import com.liferay.faces.alloy.component.outputtext.OutputText;
+import com.liferay.faces.alloy.render.internal.JavaScriptFragment;
 import com.liferay.faces.util.helper.BooleanHelper;
-import com.liferay.faces.util.js.JavaScriptFragment;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.model.SortCriterion;
@@ -190,12 +189,12 @@ public class DataTableRenderer extends DataTableRendererBase {
 
 		// Encode the hidden field that contains the client-side state of the selected index.
 		String hiddenFieldName = dataTable.getClientId(facesContext).concat("_selectedRowIndexes");
-		responseWriter.startElement(StringPool.INPUT, dataTable);
-		responseWriter.writeAttribute(StringPool.ID, hiddenFieldName, null);
-		responseWriter.writeAttribute(StringPool.NAME, hiddenFieldName, null);
-		responseWriter.writeAttribute(StringPool.TYPE, StringPool.HIDDEN, null);
-		responseWriter.writeAttribute(StringPool.VALUE, dataTable.getSelectedRowIndexes(), null);
-		responseWriter.endElement(StringPool.INPUT);
+		responseWriter.startElement("input", dataTable);
+		responseWriter.writeAttribute("id", hiddenFieldName, null);
+		responseWriter.writeAttribute("name", hiddenFieldName, null);
+		responseWriter.writeAttribute("type", "hidden", null);
+		responseWriter.writeAttribute("value", dataTable.getSelectedRowIndexes(), null);
+		responseWriter.endElement("input");
 	}
 
 	@Override
@@ -233,21 +232,19 @@ public class DataTableRenderer extends DataTableRendererBase {
 				// Register the onclick event callback for the "Select All" checkbox.
 				String selectAllCheckboxClientId = dataTableClientId.concat("_selectAll");
 				String escapedSelectAllCheckboxClientId = escapeClientId(selectAllCheckboxClientId);
-				encodeFunctionCall(responseWriter, "LFAI.initDataTableSelectAllCheckbox", 'A',
-					escapedDataTableClientId, escapedSelectAllCheckboxClientId, rowSelectRangeClientBehaviorScript,
+				encodeFunctionCall(responseWriter, "LFAI.initDataTableSelectAllCheckbox", 'A', escapedDataTableClientId,
+					escapedSelectAllCheckboxClientId, rowSelectRangeClientBehaviorScript,
 					rowDeselectRangeClientBehaviorScript);
 
 				// Register the onclick event callback for each row-level checkbox.
-				encodeFunctionCall(responseWriter, "LFAI.initDataTableCheckboxSelection", 'A',
-					escapedDataTableClientId, escapedHiddenFieldClientId, rowSelectClientBehaviorScript,
-					rowDeselectClientBehaviorScript);
+				encodeFunctionCall(responseWriter, "LFAI.initDataTableCheckboxSelection", 'A', escapedDataTableClientId,
+					escapedHiddenFieldClientId, rowSelectClientBehaviorScript, rowDeselectClientBehaviorScript);
 			}
 			else if ("radio".equals(selectionMode)) {
 
 				// Register the onclick event callback for each row-level radio button.
-				encodeFunctionCall(responseWriter, "LFAI.initDataTableRadioSelection", 'A',
-					escapedDataTableClientId, escapedHiddenFieldClientId, rowSelectClientBehaviorScript,
-					rowDeselectClientBehaviorScript);
+				encodeFunctionCall(responseWriter, "LFAI.initDataTableRadioSelection", 'A', escapedDataTableClientId,
+					escapedHiddenFieldClientId, rowSelectClientBehaviorScript, rowDeselectClientBehaviorScript);
 			}
 		}
 	}
@@ -731,6 +728,7 @@ public class DataTableRenderer extends DataTableRendererBase {
 				CommandLink commandLink = (CommandLink) application.createComponent(facesContext,
 						CommandLink.COMPONENT_TYPE, CommandLink.RENDERER_TYPE);
 				commandLink.setAjax(column.isAjax());
+
 				OutputText outputText1 = (OutputText) application.createComponent(facesContext,
 						OutputText.COMPONENT_TYPE, OutputText.RENDERER_TYPE);
 				outputText1.setValue(headerText);
@@ -952,7 +950,7 @@ public class DataTableRenderer extends DataTableRendererBase {
 		StringBuilder scriptBuilder = new StringBuilder();
 		scriptBuilder.append("function(");
 		scriptBuilder.append(parameterName);
-		scriptBuilder.append("){");
+		scriptBuilder.append(", event){");
 
 		Map<String, List<ClientBehavior>> clientBehaviorMap = dataTable.getClientBehaviors();
 		List<ClientBehavior> clientBehaviorsForEvent = clientBehaviorMap.get(eventName);

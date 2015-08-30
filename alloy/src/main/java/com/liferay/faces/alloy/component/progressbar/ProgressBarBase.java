@@ -29,7 +29,7 @@ public abstract class ProgressBarBase extends UIComponentBase implements Styleab
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.progressbar.ProgressBar";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.progressbar.internal.ProgressBarRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.progressbar.ProgressBarRenderer";
 
 	// Protected Enumerations
 	protected enum ProgressBarPropertyKeys {
@@ -41,7 +41,6 @@ public abstract class ProgressBarBase extends UIComponentBase implements Styleab
 		minProgress,
 		oncomplete,
 		pollingDelay,
-		progressCompleteListener,
 		style,
 		styleClass,
 		value,
@@ -117,14 +116,6 @@ public abstract class ProgressBarBase extends UIComponentBase implements Styleab
 
 	public void setPollingDelay(Integer pollingDelay) {
 		getStateHelper().put(ProgressBarPropertyKeys.pollingDelay, pollingDelay);
-	}
-
-	public javax.el.MethodExpression getProgressCompleteListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(ProgressBarPropertyKeys.progressCompleteListener, null);
-	}
-
-	public void setProgressCompleteListener(javax.el.MethodExpression progressCompleteListener) {
-		getStateHelper().put(ProgressBarPropertyKeys.progressCompleteListener, progressCompleteListener);
 	}
 
 	@Override

@@ -18,7 +18,6 @@ import java.io.IOException;
 import javax.faces.context.ResponseWriter;
 
 import com.liferay.faces.alloy.component.inputdatetime.internal.InputDateTimeResponseWriter;
-import com.liferay.faces.util.lang.StringPool;
 
 
 /**
@@ -26,15 +25,14 @@ import com.liferay.faces.util.lang.StringPool;
  */
 public class InputDateResponseWriter extends InputDateTimeResponseWriter {
 
-	public InputDateResponseWriter(ResponseWriter responseWriter, String idElement, String idValue, boolean mobile,
-		boolean responsive) {
-		super(responseWriter, idElement, idValue, mobile, responsive);
+	public InputDateResponseWriter(ResponseWriter responseWriter, String inputClientId, boolean nativeInputDate) {
+		super(responseWriter, inputClientId, nativeInputDate);
 	}
 
 	@Override
 	public void writeAttribute(String name, Object value, String property) throws IOException {
 
-		if (StringPool.TYPE.equals(name) && isMobile() && isResponsive()) {
+		if ("type".equals(name) && isNative()) {
 			super.writeAttribute(name, "date", property);
 		}
 		else {

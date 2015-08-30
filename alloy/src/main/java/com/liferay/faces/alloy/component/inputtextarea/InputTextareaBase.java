@@ -28,7 +28,7 @@ public abstract class InputTextareaBase extends HtmlInputTextarea implements Sty
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.inputtextarea.InputTextarea";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputtextarea.internal.InputTextareaRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputtextarea.InputTextareaRenderer";
 
 	// Protected Enumerations
 	protected enum InputTextareaPropertyKeys {
@@ -41,12 +41,29 @@ public abstract class InputTextareaBase extends HtmlInputTextarea implements Sty
 	}
 
 	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
+	}
+
+	@Override
 	public String getStyleClass() {
 		// getStateHelper().eval(InputTextareaPropertyKeys.styleClass, null) is called because super.getStyleClass() may return the
 		// STYLE_CLASS_NAME of the super class.
 		String styleClass = (String) getStateHelper().eval(InputTextareaPropertyKeys.styleClass, null);
 
-		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-input-textarea");
+		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-input-textarea", "field");
 	}
 
 	@Override

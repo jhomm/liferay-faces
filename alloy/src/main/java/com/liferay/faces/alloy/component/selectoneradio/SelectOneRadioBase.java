@@ -28,7 +28,7 @@ public abstract class SelectOneRadioBase extends HtmlSelectOneRadio implements S
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.selectoneradio.SelectOneRadio";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectoneradio.internal.SelectOneRadioRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectoneradio.SelectOneRadioRenderer";
 
 	// Protected Enumerations
 	protected enum SelectOneRadioPropertyKeys {
@@ -41,12 +41,29 @@ public abstract class SelectOneRadioBase extends HtmlSelectOneRadio implements S
 	}
 
 	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
+	}
+
+	@Override
 	public String getStyleClass() {
 		// getStateHelper().eval(SelectOneRadioPropertyKeys.styleClass, null) is called because super.getStyleClass() may return the
 		// STYLE_CLASS_NAME of the super class.
 		String styleClass = (String) getStateHelper().eval(SelectOneRadioPropertyKeys.styleClass, null);
 
-		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-select-one-radio");
+		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-select-one-radio", "radio");
 	}
 
 	@Override

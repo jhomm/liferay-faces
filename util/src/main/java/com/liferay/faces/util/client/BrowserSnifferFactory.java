@@ -13,7 +13,6 @@
  */
 package com.liferay.faces.util.client;
 
-import javax.faces.FacesException;
 import javax.faces.FacesWrapper;
 import javax.faces.context.ExternalContext;
 
@@ -23,5 +22,5 @@ import javax.faces.context.ExternalContext;
  */
 public abstract class BrowserSnifferFactory implements FacesWrapper<BrowserSnifferFactory> {
 
-	public abstract BrowserSniffer getBrowserSniffer(ExternalContext externalContext) throws FacesException;
+	public abstract BrowserSniffer getBrowserSniffer(ExternalContext externalContext);
 }

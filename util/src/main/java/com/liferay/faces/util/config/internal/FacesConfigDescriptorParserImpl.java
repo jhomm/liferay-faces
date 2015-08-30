@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 
 import javax.xml.parsers.SAXParser;
@@ -25,7 +26,6 @@ import javax.xml.parsers.SAXParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.xml.internal.SAXHandlerBase;
@@ -41,26 +41,20 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 	private static final Logger logger = LoggerFactory.getLogger(FacesConfigDescriptorParserImpl.class);
 
 	// Private Constants
+	private static final String ABSOLUTE_ORDERING = "absolute-ordering";
 	private static final String AFTER = "after";
 	private static final String BEFORE = "before";
 	private static final String FACES_CONFIG = "faces-config";
 	private static final String ORDERING = "ordering";
-
-	private static final String ABSOLUTE_ORDERING = "absolute-ordering";
-
-	// TODO StringPool or Private Constants?
-	// private static final String NAME = "name";
 	private static final String OTHERS = "others";
 
 	// Private Data Members
 	private String facesConfigName;
-	private Ordering ordering;
 	private List<String> afterNames;
 	private List<String> beforeNames;
-
 	private boolean isWebInfFacesConfig;
 	private List<String> absoluteOrdering;
-
+	private Ordering ordering;
 	private boolean parsingAbsoluteOrdering;
 	private boolean parsingAfter;
 	private boolean parsingBefore;
@@ -74,7 +68,7 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 		super(resolveEntities);
 		this.saxParser = saxParser;
 		this.afterNames = new ArrayList<String>();
-		this.ordering = new Ordering();
+		this.ordering = new OrderingImpl();
 		this.beforeNames = new ArrayList<String>();
 	}
 
@@ -116,6 +110,7 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 				if (parsingBefore) {
 
 					String beforeName = null;
+
 					if (parsingName || parsingOthers) {
 
 						if (parsingOthers) {
@@ -140,6 +135,7 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 							parsingBefore = false;
 
 							if (content != null) {
+
 								// TODO add {0} parameterization to warn
 								logger.warn("Stray content found when parsing FacesConfig named " + facesConfigName +
 									". -> Ordering -> before -> content found: " + content +
@@ -155,6 +151,7 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 				if (parsingAfter) {
 
 					String afterName = null;
+
 					if (parsingName || parsingOthers) {
 
 						if (parsingOthers) {
@@ -179,6 +176,7 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 							parsingAfter = false;
 
 							if (content != null) {
+
 								// TODO add {0} parameterization to warn
 								logger.warn("Stray content found when parsing FacesConfig named " + facesConfigName +
 									". -> Ordering -> after -> content found: " + content +
@@ -235,8 +233,10 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 
 			// Populate the ordering with routes gathered, if any.
 			if (ordering != null) {
-				String[][] routes = ordering.getRoutes();
-				String[][] routesToSet = new String[Ordering.WAYS][];
+
+				EnumMap<Ordering.Path, String[]> routes = ordering.getRoutes();
+				EnumMap<Ordering.Path, String[]> routesToSet = new EnumMap<Ordering.Path, String[]>(
+						Ordering.Path.class);
 
 				if (beforeNames.size() > 0) {
 					String[] befores = beforeNames.toArray(new String[beforeNames.size()]);
@@ -245,10 +245,10 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 						Arrays.sort(befores);
 					}
 
-					routesToSet[Ordering.BEFORE] = befores;
+					routesToSet.put(Ordering.Path.BEFORE, befores);
 				}
 				else {
-					routesToSet[Ordering.BEFORE] = routes[Ordering.BEFORE];
+					routesToSet.put(Ordering.Path.BEFORE, routes.get(Ordering.Path.BEFORE));
 				}
 
 				if (afterNames.size() > 0) {
@@ -258,10 +258,10 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 						Arrays.sort(afters);
 					}
 
-					routesToSet[Ordering.AFTER] = afters;
+					routesToSet.put(Ordering.Path.AFTER, afters);
 				}
 				else {
-					routesToSet[Ordering.AFTER] = routes[Ordering.AFTER];
+					routesToSet.put(Ordering.Path.AFTER, routes.get(Ordering.Path.AFTER));
 				}
 
 				ordering.setRoutes(routesToSet);
@@ -313,14 +313,12 @@ public class FacesConfigDescriptorParserImpl extends SAXHandlerBase implements F
 			}
 			else {
 				this.absoluteOrdering = null;
-				this.ordering = new Ordering();
+				this.ordering = new OrderingImpl();
 				this.afterNames = new ArrayList<String>();
 				this.beforeNames = new ArrayList<String>();
 			}
 		}
-
-		// TODO StringPool for all for these?
-		else if (localName.equals(StringPool.NAME)) {
+		else if (localName.equals("name")) {
 			parsingName = true;
 		}
 		else if (localName.equals(ABSOLUTE_ORDERING)) {

@@ -26,13 +26,12 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
+import com.liferay.faces.util.HttpHeaders;
 import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.model.UploadedFile;
 import com.liferay.faces.util.model.UploadedFileFactory;
-import com.liferay.faces.util.render.HttpHeaders;
 
 
 /**
@@ -55,7 +54,7 @@ public class InputFileDecoderPartImpl extends InputFileDecoderBase {
 
 		// FACES-1452: Non-alpha-numeric characters must be removed order to ensure that the folder will be
 		// created properly.
-		sessionId = sessionId.replaceAll("[^A-Za-z0-9]", StringPool.BLANK);
+		sessionId = sessionId.replaceAll("[^A-Za-z0-9]", "");
 
 		File uploadedFilesPath = new File(uploadedFilesFolder, sessionId);
 
@@ -87,23 +86,23 @@ public class InputFileDecoderPartImpl extends InputFileDecoderBase {
 					String safeFileName = null;
 
 					String contentDispositionHeader = part.getHeader(HttpHeaders.CONTENT_DISPOSITION);
-					String[] keyValuePairs = contentDispositionHeader.split(StringPool.SEMICOLON);
+					String[] keyValuePairs = contentDispositionHeader.split(";");
 
 					for (String keyValuePair : keyValuePairs) {
 						String trimmedKeyValuePair = keyValuePair.trim();
 
 						if (trimmedKeyValuePair.startsWith("filename")) {
-							int equalsPos = trimmedKeyValuePair.indexOf(StringPool.EQUAL);
+							int equalsPos = trimmedKeyValuePair.indexOf("=");
 							fileName = trimmedKeyValuePair.substring(equalsPos + 2, trimmedKeyValuePair.length() - 1);
 							safeFileName = stripIllegalCharacters(fileName);
 						}
-						else if (trimmedKeyValuePair.startsWith(StringPool.NAME)) {
-							int equalsPos = trimmedKeyValuePair.indexOf(StringPool.EQUAL);
+						else if (trimmedKeyValuePair.startsWith("name")) {
+							int equalsPos = trimmedKeyValuePair.indexOf("=");
 							fieldName = trimmedKeyValuePair.substring(equalsPos + 2, trimmedKeyValuePair.length() - 1);
 						}
 					}
 
-					if (fileName != null) {
+					if ((fileName != null) && (fileName.length() > 0)) {
 
 						try {
 
@@ -128,13 +127,13 @@ public class InputFileDecoderPartImpl extends InputFileDecoderBase {
 							String charSet = null;
 
 							if (contentType != null) {
-								keyValuePairs = contentType.split(StringPool.SEMICOLON);
+								keyValuePairs = contentType.split(";");
 
 								for (String keyValuePair : keyValuePairs) {
 									String trimmedKeyValuePair = keyValuePair.trim();
 
 									if (trimmedKeyValuePair.startsWith("charset")) {
-										int equalsPos = trimmedKeyValuePair.indexOf(StringPool.EQUAL);
+										int equalsPos = trimmedKeyValuePair.indexOf("=");
 										charSet = trimmedKeyValuePair.substring(equalsPos + 2,
 												trimmedKeyValuePair.length() - 1);
 									}

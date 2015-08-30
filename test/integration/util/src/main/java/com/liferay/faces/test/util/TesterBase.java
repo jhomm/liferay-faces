@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test.util;
+//J-
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +40,7 @@ public class TesterBase {
 	private static final String passwordFieldXpath = "//input[contains(@id,'_58_password')]";
 	private static final String signInButtonXpath = "//button[@type='submit' and contains(text(),'Sign In')]";
 	private static final String signedInTextXpath = "//div[contains(text(),'You are signed in as')]";
-	
+
 	@FindBy(xpath = emailFieldXpath)
 	private WebElement emailField;
 	@FindBy(xpath = passwordFieldXpath)
@@ -48,13 +49,13 @@ public class TesterBase {
 	private WebElement signInButton;
 	@FindBy(xpath = signedInTextXpath)
 	private WebElement signedInText;
-	
+
 	// elements for logging into pluto
 	private static final String userNameXpath = "//input[contains(@id,'j_username')]";
 	private static final String passwordXpath = "//input[contains(@id,'j_password')]";
 	private static final String loginButtonXpath = "//input[@type='submit' and @value='Login']";
 	private static final String logoutXpath = "//a[contains(text(),'Logout')]";
-	
+
 	@FindBy(xpath = userNameXpath)
 	private WebElement userName;
 	@FindBy(xpath = passwordXpath)
@@ -63,69 +64,91 @@ public class TesterBase {
 	private WebElement loginButton;
 	@FindBy(xpath = logoutXpath)
 	private WebElement logout;
-	
+
 	// portlet name for liferay
 	private static final String portletDisplayNameXpath = "//header[@class='portlet-topper']/h1/span";
 	@FindBy(xpath = portletDisplayNameXpath)
 	protected WebElement portletDisplayName;
-	
+
 	// portlet name element for pluto
 	private static final String plutoPortletDisplayNameXpath = "//td[@class='header']/h2";
 	@FindBy(xpath = plutoPortletDisplayNameXpath)
 	protected WebElement plutoPortletDisplayName;
-	
+
 	protected String displayNameXpath;
 	protected WebElement displayName;
-		
+
 	// elements for switching to edit mode in liferay
 	private static final String menuButtonXpath = "//a[contains(@title,'Options')]";
 	private static final String menuPreferencesXpath = "//span[contains(text(),'Preferences')]/..";
-	
+
 	@FindBy(xpath = menuButtonXpath)
 	private WebElement menuButton;
 	@FindBy(xpath = menuPreferencesXpath)
 	private WebElement menuPreferences;
-	
+
 	// xpath for switching to edit mode in pluto
-	private static final String plutoMenuButtonXpath = "//form[@name='modeSelectionForm']/select";	
-	
+	private static final String plutoMenuButtonXpath = "//form[@name='modeSelectionForm']/select";
+
 	private static final String JERSEY_FILE = "liferay-jsf-jersey.png";
-	
+
 	public static final String portal = System.getProperty("integration.portal", "liferay");
 	public static final String baseUrl = System.getProperty("integration.url", "http://localhost:8080");
 	public static final String signInContext = System.getProperty("integration.signin", "/web/guest/home");
-	public static final String webContext = System.getProperty("integration.context", "/web/bridge-demos/");
+	public static final String webContext = System.getProperty("integration.context", "/web/bridge-demos");
 	protected static final String signInUrl = baseUrl + signInContext;
-	
+
 	// @Drone
 	// public WebDriver browser;
-	
+
 	public void signIn(WebDriver browser) throws Exception {
 		logger.log(Level.INFO, "portal = " + portal);
 		if ("liferay".equals(portal)) {
-			signIn(browser, emailField, passwordField, signInButton, signedInText, "test@liferay.com", "test");
+			signIn(browser, emailField, passwordField, signInButton, signedInText, signedInTextXpath, "test@liferay.com", "test");
 		} else if ("pluto".equals(portal)) {
-			signIn(browser, userName, password, loginButton, logout, "pluto", "pluto");
+			signIn(browser, userName, password, loginButton, logout, logoutXpath, "pluto", "pluto");
 		} else {
 			logger.log(Level.SEVERE, "not a supported portal for this tester base: portal = " + portal + "");
 		}
 	}
 
-	public void signIn(WebDriver browser, WebElement user, WebElement pass, WebElement button, WebElement text, String u, String p) throws Exception {
-		
+	public void signIn(WebDriver browser, WebElement user, WebElement pass, WebElement button, WebElement text, String textXpath, String u, String p) throws Exception {
+
 		java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
 
 		logger.log(Level.INFO, "browser.navigate().to(" + signInUrl + ")");
 		browser.navigate().to(signInUrl);
 		logger.log(Level.INFO, "browser.getTitle() = " + browser.getTitle() + " before signing in ...");
-		
+
 		if (browser.getTitle().contains("Status")) {
 			logger.log(Level.INFO, "welcome-theme installed ...");
 			String welcomeSignInUrl = signInUrl.replace("home", "welcome");
+			logger.log(Level.INFO, "browser.navigate().to(" + welcomeSignInUrl + ")");
 			browser.navigate().to(welcomeSignInUrl);
 			logger.log(Level.INFO, "browser.getTitle() = " + browser.getTitle() + " before signing in ...");
-		} else { 
+		} else {
 			logger.log(Level.INFO, "no welcome-theme, no problem ...");
+		}
+
+		if (isThere(browser, "//div[contains(text()[2],'was not found')]")) {
+
+			// attempt to go to a Bridge Demos to get to the login page
+			logger.log(Level.INFO, "Attempting to go to a Bridge Demos to get to the login page ...");
+			String bridgeDemosSignInUrl = baseUrl + "/group/bridge-demos/";
+			logger.log(Level.INFO, "browser.navigate().to(" + bridgeDemosSignInUrl + ")");
+			browser.navigate().to(bridgeDemosSignInUrl);
+			logger.log(Level.INFO, "browser.getTitle() = " + browser.getTitle() + " before signing in ...");
+
+			waitForElement(browser, emailFieldXpath);
+			user.clear();
+			user.sendKeys(u);
+			pass.clear();
+			pass.sendKeys(p);
+			button.click();
+
+			waitForElement(browser, "//span[contains(text(),'Bridge Demos')]");
+
+			return;
 		}
 
 		user.clear();
@@ -133,12 +156,12 @@ public class TesterBase {
 		pass.clear();
 		pass.sendKeys(p);
 		button.click();
-		logger.log(Level.INFO, "browser.getTitle() = " + browser.getTitle() + " after clicking the sign in button.  Now waiting ...");
-		waitForElement(browser, signedInTextXpath);
+		logger.log(Level.INFO, "browser.getTitle() = " + browser.getTitle() + " after clicking the sign in button.	Now waiting ...");
+		waitForElement(browser, textXpath);
 		logger.log(Level.INFO, text.getText());
 
 	}
-	
+
 	public void selectEditMode(WebDriver browser, String portal) {
 		logger.log(Level.INFO, "portal = " + portal);
 		if (portal.equals("liferay")) {
@@ -147,13 +170,13 @@ public class TesterBase {
 			selectEditModeInPluto(browser);
 		}
 	}
-	
+
 	public void selectEditModeInPluto(WebDriver browser) {
 		Select select = new Select(browser.findElement(By.xpath(plutoMenuButtonXpath)));
 		// select.deselectAll();  // You may only deselect all options of a multi-select
 		select.selectByVisibleText("EDIT");
 	}
-	
+
 	public void selectEditModeInLiferay() {
 		if (menuPreferences.isDisplayed()) {
 			logger.log(Level.INFO, "menuPreferences is already displayed ... why is that? ");
@@ -167,7 +190,7 @@ public class TesterBase {
 			logger.log(Level.INFO, "menuPreferences should be displayed at this point, but it is not ... ");
 		}
 	}
-	
+
 	// in order for displayName not to be null
 	// this method must be called after the tester is instantiated (and we are on the right page, of course)
 	// if you try to declare and initialize displayName earlier or when this class is instantiated,
@@ -220,3 +243,4 @@ public class TesterBase {
 	}
 
 }
+//J+

@@ -8,6 +8,10 @@
 			<f:viewParam name="componentPrefix" value="#{showcaseModelBean.viewParameters.componentPrefix}" />
 			<f:viewParam name="componentName" value="#{showcaseModelBean.viewParameters.componentName}" />
 			<f:viewParam name="componentUseCase" value="#{showcaseModelBean.viewParameters.componentUseCase}" />
+			<f:viewParam name="menuItem" value="#{buttonBean.menuItem}" />
+			<f:viewParam name="countryId" value="#{viewMetadataBackingBean.viewCountry}">
+				<f:converter converterId="com.liferay.faces.demos.converter.CountryConverter" />
+			</f:viewParam>
 		</f:metadata>
 		<h:outputStylesheet name="component.css" library="css" />
 		<c:set value="#{showcaseModelBean.selectedComponent}" var="selectedComponent" />

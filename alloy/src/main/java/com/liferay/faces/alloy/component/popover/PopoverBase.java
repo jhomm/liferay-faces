@@ -29,7 +29,7 @@ public abstract class PopoverBase extends PanelGroupBlockLayout implements Style
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.popover.Popover";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.popover.internal.PopoverRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.popover.PopoverRenderer";
 
 	// Protected Enumerations
 	protected enum PopoverPropertyKeys {
@@ -110,7 +110,7 @@ public abstract class PopoverBase extends PanelGroupBlockLayout implements Style
 	}
 
 	public String getPosition() {
-		return (String) getStateHelper().eval(PopoverPropertyKeys.position, com.liferay.faces.util.lang.StringPool.RIGHT);
+		return (String) getStateHelper().eval(PopoverPropertyKeys.position, "right");
 	}
 
 	public void setPosition(String position) {

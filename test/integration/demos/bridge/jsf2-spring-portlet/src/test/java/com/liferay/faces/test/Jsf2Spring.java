@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test;
+//J-
 
 import java.util.logging.Logger;
 
@@ -21,7 +22,7 @@ import org.openqa.selenium.WebElement;
 import com.liferay.faces.test.util.TesterBase;
 
 /**
- * @author  Liferay Faces Team
+ * @author	Liferay Faces Team
  */
 public class Jsf2Spring extends TesterBase {
 
@@ -34,7 +35,7 @@ public class Jsf2Spring extends TesterBase {
 	private static final String portletDisplayNameXpath = "//header[@class='portlet-topper']/h1/span";
 	private static final String menuButtonXpath = "//*[contains(text(),'Options')]/..";
 	private static final String menuPreferencesXpath = "//img[contains(@src,'/edit.png')]";
-	
+
 	// preferences elements
 	private static final String datePatternFieldXpath = "//input[contains(@id,':datePattern')]";
 	private static final String resetButtonXpath = "//input[@type='submit' and @value='Reset']";
@@ -64,7 +65,7 @@ public class Jsf2Spring extends TesterBase {
 	private static final String provinceIdFieldErrorXpath = "//select[contains(@id,':provinceId')]/following-sibling::*[1]";
 
 	private static final String provinceIdSelectorXpath = "";
-	
+
 	private static final String postalCodeFieldXpath = "//input[contains(@id,':postalCode')]";
 	private static final String postalCodeFieldErrorXpath = "//input[contains(@id,':postalCode')]/following-sibling::*[1]/following-sibling::*[1]";
 
@@ -88,8 +89,9 @@ public class Jsf2Spring extends TesterBase {
 	private static final String alloyVersionXpath = "//*[contains(text(),'Liferay Faces Alloy')]";
 	private static final String bridgeVersionXpath = "//*[contains(text(),'Liferay Faces Bridge')]";
 
-	// xpath for specific tests
-	protected static final String dateValidationXpath = "//input[contains(@id,':dateOfBirth')]/../child::node()";
+	private static final String versionUlXpath = "//*[contains(text(),'Liferay Faces Bridge')]/../../../ul";
+	private static final String windowInnerHeightXpath = "//em[@id='window.innerHeight']";
+	private static final String windowInnerWidthXpath = "//em[@id='window.innerWidth']";
 
 	static final String url = baseUrl + webContext + "/jsf2-spring";
 
@@ -171,7 +173,6 @@ public class Jsf2Spring extends TesterBase {
 	private WebElement alloyVersion;
 	@FindBy(xpath = bridgeVersionXpath)
 	private WebElement bridgeVersion;
-	
-	protected int dateValidationXpathModifier = 2;
 
 }
+//J+

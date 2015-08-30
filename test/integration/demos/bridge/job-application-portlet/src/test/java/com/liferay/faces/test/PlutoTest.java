@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test;
+//J-
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +36,7 @@ import com.liferay.faces.test.util.TesterBase;
 
 
 /**
- * @author  Liferay Faces Team
+ * @author	Liferay Faces Team
  */
 @RunWith(Arquillian.class)
 public class PlutoTest extends TesterBase {
@@ -187,9 +188,9 @@ public class PlutoTest extends TesterBase {
 	private WebElement alloyVersion;
 	@FindBy(xpath = bridgeVersionXpath)
 	private WebElement bridgeVersion;
-	
+
 	protected int dateValidationXpathModifier = 1;
-	
+
 	@Drone
 	WebDriver browser;
 
@@ -300,7 +301,7 @@ public class PlutoTest extends TesterBase {
 		Thread.sleep(50);
 		logger.log(Level.INFO, "firstNameField.getAttribute('value') = " + firstNameField.getAttribute("value"));
 		assertTrue(
-			"The data 'asdf' should no longer be in the firstNameField after clearing it out with BACK_SPACE and then tabbing out.  " +
+			"The data 'asdf' should no longer be in the firstNameField after clearing it out with BACK_SPACE and then tabbing out.	" +
 			"But we see '" + firstNameField.getAttribute("value") + "'",
 			"".equals(firstNameField.getAttribute("value")));
 		logger.log(Level.INFO, "isThere(browser, firstNameFieldErrorXpath) = " + isThere(browser, firstNameFieldErrorXpath));
@@ -817,3 +818,4 @@ public class PlutoTest extends TesterBase {
 	}
 
 }
+//J+

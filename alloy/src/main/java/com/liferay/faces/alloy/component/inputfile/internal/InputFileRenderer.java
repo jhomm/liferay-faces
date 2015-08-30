@@ -30,20 +30,15 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
 import javax.faces.render.FacesRenderer;
-import javax.faces.validator.Validator;
 
 import com.liferay.faces.alloy.component.inputfile.FileUploadEvent;
 import com.liferay.faces.alloy.component.inputfile.InputFile;
-import com.liferay.faces.alloy.component.inputfile.InputFileValidator;
-import com.liferay.faces.util.component.ComponentUtil;
+import com.liferay.faces.alloy.render.internal.JavaScriptFragment;
 import com.liferay.faces.util.component.Styleable;
 import com.liferay.faces.util.context.MessageContext;
 import com.liferay.faces.util.context.MessageContextFactory;
 import com.liferay.faces.util.context.map.MultiPartFormData;
 import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.js.JavaScriptArray;
-import com.liferay.faces.util.js.JavaScriptFragment;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.model.UploadedFile;
 import com.liferay.faces.util.product.ProductConstants;
 import com.liferay.faces.util.product.ProductMap;
@@ -107,28 +102,27 @@ public class InputFileRenderer extends InputFileRendererBase {
 
 		ResponseWriter responseWriter = facesContext.getResponseWriter();
 		InputFile inputFile = (InputFile) uiComponent;
-		String clientId = inputFile.getClientId(facesContext);
+		JavaScriptFragment alloyNamespace = new JavaScriptFragment("A");
 
 		// Determine the valid content-types and maximum file size from the validator (if specified).
-		JavaScriptArray contentTypes = new JavaScriptArray();
-		JavaScriptFragment alloyNamespace = new JavaScriptFragment("A");
-		long maxFileSize = Long.MAX_VALUE;
-		InputFileValidator inputFileValidator = getInputFileValidator(inputFile);
+		JavaScriptFragment contentTypes = new JavaScriptFragment("[]");
+		String validContentTypes = inputFile.getContentTypes();
 
-		if (inputFileValidator != null) {
-			String validContentTypes = inputFileValidator.getContentTypes();
+		if (validContentTypes != null) {
+			contentTypes = toJavaScriptArray(validContentTypes.split(","));
+		}
 
-			if (validContentTypes != null) {
-				contentTypes = new JavaScriptArray(validContentTypes.split(","));
-			}
+		String clientId = inputFile.getClientId(facesContext);
+		Long maxFileSize = inputFile.getMaxFileSize();
 
-			maxFileSize = inputFileValidator.getMaxFileSize();
+		if (maxFileSize == null) {
+			maxFileSize = Long.MAX_VALUE;
 		}
 
 		// If the component should render the upload progress table, then initialize the YUI progress uploader widget.
 		if (inputFile.isShowProgress()) {
 
-			String clientVarName = ComponentUtil.getClientVarName(facesContext, inputFile);
+			String clientVarName = getClientVarName(facesContext, inputFile);
 			String clientKey = inputFile.getClientKey();
 
 			if (clientKey == null) {
@@ -142,7 +136,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 			ViewHandler viewHandler = application.getViewHandler();
 			String actionURL = viewHandler.getActionURL(facesContext, viewRoot.getViewId());
 			String partialActionURL = facesContext.getExternalContext().encodePartialActionURL(actionURL);
-			String namingContainerId = StringPool.BLANK;
+			String namingContainerId = "";
 
 			if (viewRoot instanceof NamingContainer) {
 				namingContainerId = viewRoot.getContainerClientId(facesContext);
@@ -178,10 +172,10 @@ public class InputFileRenderer extends InputFileRendererBase {
 		if (inputFile.isShowPreview() || inputFile.isShowProgress()) {
 
 			// Start encoding the outermost <div> element.
-			responseWriter.startElement(StringPool.DIV, uiComponent);
+			responseWriter.startElement("div", uiComponent);
 
 			String clientId = uiComponent.getClientId(facesContext);
-			responseWriter.writeAttribute(StringPool.ID, clientId, StringPool.ID);
+			responseWriter.writeAttribute("id", clientId, "id");
 			RendererUtil.encodeStyleable(responseWriter, (Styleable) uiComponent);
 
 			// If the component should render the upload progress table, then format the progress-table.html template
@@ -217,7 +211,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 
 			// Finish encoding of the outermost <div> element. Since the template contains its own "Select Files"
 			// button, delegation must not occur.
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.endElement("div");
 		}
 
 		// Otherwise, if the component should show the preview table, then
@@ -226,7 +220,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 			encodePreview(facesContext, responseWriter, inputFile);
 
 			// Finish encoding of the outermost <div> element.
-			responseWriter.endElement(StringPool.DIV);
+			responseWriter.endElement("div");
 		}
 
 		// Otherwise, delegate writing of the entire <input type="file"...> ... </input> element to the delegate
@@ -256,7 +250,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 		String chooseFiles = getMessageContext().getMessage(locale, "choose-files");
 		StringBuilder selectFilesButtonScript = new StringBuilder();
 		selectFilesButtonScript.append(
-			"A.Node.create(\"<button type='button' class='yui3-widget btn btn-content' role='button' aria-label='");
+			"A.Node.create(\"<button type='button' class='alloy-button' role='button' aria-label='");
 		selectFilesButtonScript.append(chooseFiles);
 		selectFilesButtonScript.append("' tabindex='{tabIndex}'>");
 		selectFilesButtonScript.append(chooseFiles);
@@ -264,7 +258,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 		encodeNonEscapedObject(responseWriter, "selectFilesButton", selectFilesButtonScript, first);
 	}
 
-	private void encodePreview(FacesContext facesContext, ResponseWriter responseWriter, InputFile inputFile)
+	protected void encodePreview(FacesContext facesContext, ResponseWriter responseWriter, InputFile inputFile)
 		throws IOException {
 
 		// Delegate writing of the entire <input type="file"...> ... </input> element to the delegate renderer.
@@ -278,11 +272,11 @@ public class InputFileRenderer extends InputFileRendererBase {
 		responseWriter.startElement("div", inputFile);
 		responseWriter.startElement("table", inputFile);
 		responseWriter.writeAttribute("id", clientId + "_table", null);
-		responseWriter.writeAttribute("class", "yui3-datatable-table", null);
+		responseWriter.writeAttribute("class", "table table-bordered", null);
 		responseWriter.startElement("thead", inputFile);
+		responseWriter.writeAttribute("class", "table-columns", null);
 		responseWriter.startElement("tr", inputFile);
 		responseWriter.startElement("th", inputFile);
-		responseWriter.writeAttribute("class", "yui3-datatable-header", null);
 
 		MessageContextFactory messageContextFactory = (MessageContextFactory) FactoryExtensionFinder.getFactory(
 				MessageContextFactory.class);
@@ -291,13 +285,11 @@ public class InputFileRenderer extends InputFileRendererBase {
 		responseWriter.writeText(i18nFileName, null);
 		responseWriter.endElement("th");
 		responseWriter.startElement("th", inputFile);
-		responseWriter.writeAttribute("class", "yui3-datatable-header", null);
 
 		String i18nFileType = messageContext.getMessage(locale, "file-type");
 		responseWriter.writeText(i18nFileType, null);
 		responseWriter.endElement("th");
 		responseWriter.startElement("th", inputFile);
-		responseWriter.writeAttribute("class", "yui3-datatable-header", null);
 
 		String i18nFileSize = messageContext.getMessage(locale, "file-size");
 		responseWriter.writeText(i18nFileSize, null);
@@ -307,8 +299,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 		responseWriter.startElement("tfoot", inputFile);
 		responseWriter.startElement("tr", inputFile);
 		responseWriter.startElement("td", inputFile);
-		responseWriter.writeAttribute("class", "yui3-datatable-cell", null);
-		responseWriter.writeAttribute("colspan", "2", null);
+		responseWriter.writeAttribute("colspan", "3", null);
 
 		String i18nNoFilesSelected = messageContext.getMessage(locale, "no-files-selected");
 		responseWriter.writeText(i18nNoFilesSelected, null);
@@ -323,7 +314,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 		responseWriter.endElement("div");
 	}
 
-	private void encodeProgress(FacesContext facesContext, ResponseWriter responseWriter, UIComponent uiComponent,
+	protected void encodeProgress(FacesContext facesContext, ResponseWriter responseWriter, UIComponent uiComponent,
 		String clientId) throws IOException {
 
 		Locale locale = facesContext.getViewRoot().getLocale();
@@ -336,7 +327,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 		responseWriter.writeAttribute("class", "upload-files-box", null);
 		responseWriter.startElement("button", uiComponent);
 		responseWriter.writeAttribute("id", clientId + "_uploadFilesButton", null);
-		responseWriter.writeAttribute("class", "yui3-widget btn btn-content", null);
+		responseWriter.writeAttribute("class", "alloy-button", null);
 
 		MessageContextFactory messageContextFactory = (MessageContextFactory) FactoryExtensionFinder.getFactory(
 				MessageContextFactory.class);
@@ -348,29 +339,26 @@ public class InputFileRenderer extends InputFileRendererBase {
 		responseWriter.startElement("div", uiComponent);
 		responseWriter.startElement("table", uiComponent);
 		responseWriter.writeAttribute("id", clientId + "_table", null);
-		responseWriter.writeAttribute("class", "yui3-datatable-table", null);
+		responseWriter.writeAttribute("class", "table table-bordered", null);
 		responseWriter.startElement("thead", uiComponent);
+		responseWriter.writeAttribute("class", "table-columns", null);
 		responseWriter.startElement("tr", uiComponent);
 		responseWriter.startElement("th", uiComponent);
-		responseWriter.writeAttribute("class", "yui3-datatable-header", null);
 
 		String i18nFileName = messageContext.getMessage(locale, "file-name");
 		responseWriter.writeText(i18nFileName, null);
 		responseWriter.endElement("th");
 		responseWriter.startElement("th", uiComponent);
-		responseWriter.writeAttribute("class", "yui3-datatable-header", null);
 
 		String i18nFileType = messageContext.getMessage(locale, "file-type");
 		responseWriter.writeText(i18nFileType, null);
 		responseWriter.endElement("th");
 		responseWriter.startElement("th", uiComponent);
-		responseWriter.writeAttribute("class", "yui3-datatable-header", null);
 
 		String i18nFileSize = messageContext.getMessage(locale, "file-size");
 		responseWriter.writeText(i18nFileSize, null);
 		responseWriter.endElement("th");
 		responseWriter.startElement("th", uiComponent);
-		responseWriter.writeAttribute("class", "yui3-datatable-header", null);
 
 		String i18nProgress = messageContext.getMessage(locale, "progress");
 		responseWriter.writeText(i18nProgress, null);
@@ -380,8 +368,7 @@ public class InputFileRenderer extends InputFileRendererBase {
 		responseWriter.startElement("tfoot", uiComponent);
 		responseWriter.startElement("tr", uiComponent);
 		responseWriter.startElement("td", uiComponent);
-		responseWriter.writeAttribute("class", "yui3-datatable-cell", null);
-		responseWriter.writeAttribute("colspan", "3", null);
+		responseWriter.writeAttribute("colspan", "4", null);
 
 		String i18nNoFilesSelected = messageContext.getMessage(locale, "no-files-selected");
 		responseWriter.writeText(i18nNoFilesSelected, null);
@@ -396,27 +383,33 @@ public class InputFileRenderer extends InputFileRendererBase {
 		responseWriter.endElement("div");
 	}
 
+	protected JavaScriptFragment toJavaScriptArray(String[] items) {
+
+		StringBuilder buf = new StringBuilder("[");
+
+		if (items != null) {
+
+			for (int i = 0; i < items.length; i++) {
+
+				if (i > 0) {
+					buf.append(",");
+				}
+
+				buf.append("'");
+				buf.append(items[i].trim());
+				buf.append("'");
+			}
+		}
+
+		buf.append("]");
+
+		return new JavaScriptFragment(buf.toString());
+	}
+
 	@Override
 	public Object getConvertedValue(FacesContext facesContext, UIComponent uiComponent, Object submittedValue)
 		throws ConverterException {
 		return submittedValue;
-	}
-
-	protected InputFileValidator getInputFileValidator(InputFile inputFile) {
-
-		InputFileValidator inputFileValidator = null;
-		Validator[] validators = inputFile.getValidators();
-
-		for (Validator validator : validators) {
-
-			if (validator instanceof InputFileValidator) {
-				inputFileValidator = (InputFileValidator) validator;
-
-				break;
-			}
-		}
-
-		return inputFileValidator;
 	}
 
 	protected MessageContext getMessageContext() {

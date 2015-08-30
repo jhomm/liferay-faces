@@ -18,10 +18,6 @@ import java.util.List;
 
 import org.xml.sax.Attributes;
 
-import com.liferay.faces.bridge.internal.BridgeConstants;
-import com.liferay.faces.util.application.ResourceConstants;
-import com.liferay.faces.util.lang.StringPool;
-
 
 /**
  * @author  Neil Griffin
@@ -69,11 +65,11 @@ public class HeadResource {
 			}
 		}
 
-		if (StringPool.LINK.equals(type)) {
-			url = attributes.getValue(StringPool.HREF);
+		if ("link".equals(type)) {
+			url = attributes.getValue("href");
 		}
-		else if (StringPool.SCRIPT.equals(type)) {
-			url = attributes.getValue(BridgeConstants.SRC);
+		else if ("script".equals(type)) {
+			url = attributes.getValue("src");
 		}
 
 		initialize();
@@ -88,8 +84,7 @@ public class HeadResource {
 		if ((url != null) && url.equals(otherHeadResource.getURL())) {
 			equal = true;
 		}
-		else if ((StringPool.LINK.equals(type) || StringPool.SCRIPT.equals(type)) &&
-				type.equals(otherHeadResource.getType())) {
+		else if (("link".equals(type) || "script".equals(type)) && type.equals(otherHeadResource.getType())) {
 
 			String facesResource2 = otherHeadResource.getFacesResource();
 			String facesLibrary2 = otherHeadResource.getFacesLibrary();
@@ -109,31 +104,29 @@ public class HeadResource {
 	public String toString() {
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(StringPool.LESS_THAN);
+		stringBuilder.append("<");
 		stringBuilder.append(type);
 
 		if (attributeList != null) {
 
 			for (HeadResourceAttribute headResourceAttribute : attributeList) {
-				stringBuilder.append(StringPool.SPACE);
+				stringBuilder.append(" ");
 				stringBuilder.append(headResourceAttribute.getName());
-				stringBuilder.append(StringPool.EQUAL);
-				stringBuilder.append(StringPool.QUOTE);
+				stringBuilder.append("=\"");
 				stringBuilder.append(headResourceAttribute.getValue());
-				stringBuilder.append(StringPool.QUOTE);
+				stringBuilder.append("\"");
 			}
 		}
 
-		stringBuilder.append(StringPool.GREATER_THAN);
+		stringBuilder.append(">");
 
 		if (text != null) {
 			stringBuilder.append(text);
 		}
 
-		stringBuilder.append(StringPool.LESS_THAN);
-		stringBuilder.append(StringPool.FORWARD_SLASH);
+		stringBuilder.append("</");
 		stringBuilder.append(type);
-		stringBuilder.append(StringPool.GREATER_THAN);
+		stringBuilder.append(">");
 
 		return stringBuilder.toString();
 	}
@@ -142,22 +135,22 @@ public class HeadResource {
 
 		if (url != null) {
 
-			int queryPos = url.indexOf(StringPool.QUESTION);
+			int queryPos = url.indexOf("?");
 
 			if (queryPos > 0) {
 				String parameters = url.substring(queryPos + 1);
-				String[] nameValuePairs = parameters.split(BridgeConstants.REGEX_AMPERSAND_DELIMITER);
+				String[] nameValuePairs = parameters.split("[&]");
 
 				for (String nameValuePair : nameValuePairs) {
-					int equalsPos = nameValuePair.indexOf(StringPool.EQUAL);
+					int equalsPos = nameValuePair.indexOf("=");
 
 					if (equalsPos > 0) {
 						String name = nameValuePair.substring(0, equalsPos);
 
-						if (name.endsWith(ResourceConstants.JAVAX_FACES_RESOURCE)) {
+						if (name.endsWith("javax.faces.resource")) {
 							facesResource = nameValuePair.substring(equalsPos + 1);
 						}
-						else if (name.endsWith(ResourceConstants.LN)) {
+						else if (name.endsWith("ln")) {
 							facesLibrary = nameValuePair.substring(equalsPos + 1);
 						}
 					}

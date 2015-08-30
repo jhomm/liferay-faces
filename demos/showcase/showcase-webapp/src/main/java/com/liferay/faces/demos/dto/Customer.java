@@ -16,8 +16,6 @@ package com.liferay.faces.demos.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.liferay.faces.util.lang.StringPool;
-
 
 /**
  * @author  Neil Griffin
@@ -29,29 +27,25 @@ public class Customer implements Serializable {
 
 	// Private Data Members
 	private long customerId;
-	private long countryId;
+	private Country country;
 	private Date dateOfBirth;
 	private String firstName;
 	private String lastName;
 
-	public Customer(long customerId, long countryId, String firstName, String lastName, Date dateOfBirth) {
+	public Customer(long customerId, Country country, String firstName, String lastName, Date dateOfBirth) {
 		this.customerId = customerId;
-		this.countryId = countryId;
+		this.country = country;
 		this.dateOfBirth = dateOfBirth;
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
 
-	public String getFullName() {
-		return firstName + StringPool.SPACE + lastName;
+	public Country getCountry() {
+		return country;
 	}
 
-	public long getCountryId() {
-		return countryId;
-	}
-
-	public void setCountryId(long countryId) {
-		this.countryId = countryId;
+	public void setCountry(Country country) {
+		this.country = country;
 	}
 
 	public long getCustomerId() {
@@ -76,6 +70,10 @@ public class Customer implements Serializable {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public String getFullName() {
+		return firstName + " " + lastName;
 	}
 
 	public String getLastName() {

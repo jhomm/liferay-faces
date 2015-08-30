@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +67,6 @@ import com.liferay.faces.bridge.internal.BridgeExt;
 import com.liferay.faces.bridge.scope.BridgeRequestScope;
 import com.liferay.faces.util.config.ConfiguredServletMapping;
 import com.liferay.faces.util.helper.BooleanHelper;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -91,7 +91,6 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 	// Private Data Members
 	private Map<String, Object> attributeMap = new HashMap<String, Object>();
 	private BridgeConfig bridgeConfig;
-	private Boolean bridgeRequestScopePreserved;
 	private BridgeRequestScope bridgeRequestScope;
 	private BridgeURIFactory bridgeURIFactory;
 	private BridgeURLFactory bridgeURLFactory;
@@ -225,7 +224,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 						configuredFacesServletMappings);
 
 				if (!bridgeURI.isAbsolute() && !targetFacesView.isExtensionMapped() &&
-						!targetFacesView.isPathMapped() && !url.startsWith(StringPool.POUND)) {
+						!targetFacesView.isPathMapped() && !url.startsWith("#")) {
 					bridgeActionURL.setParameter(Bridge.NONFACES_TARGET_PATH_PARAMETER, contextRelativeViewPath);
 				}
 
@@ -291,12 +290,19 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 
 		logger.debug("encodeRedirectURL fromURL=[{0}]", baseUrl);
 
-		BridgeContext bridgeContext = BridgeContext.getCurrentInstance();
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+
+		if (isJSF2PartialRequest(facesContext)) {
+
+			ArrayList<String> bridgeAjaxRedirect = new ArrayList<String>();
+			bridgeAjaxRedirect.add("true");
+			parameters.put("_bridgeAjaxRedirect", bridgeAjaxRedirect);
+		}
 
 		try {
 
+			BridgeContext bridgeContext = BridgeContext.getCurrentInstance();
 			BridgeURI bridgeURI = bridgeURIFactory.getBridgeURI(baseUrl);
-
 			String redirectViewId = null;
 
 			if (!bridgeURI.isExternal()) {
@@ -446,7 +452,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 					boolean directLink = (queryString != null) && queryString.contains(DIRECT_LINK_EQUALS_TRUE);
 
 					if ((portletPhase == Bridge.PortletPhase.ACTION_PHASE) &&
-							(url.startsWith(StringPool.POUND) || bridgeURI.isExternal() || directLink)) {
+							(url.startsWith("#") || bridgeURI.isExternal() || directLink)) {
 
 						bridgeRequestScope.setRedirectOccurred(true);
 
@@ -557,8 +563,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 
 									// TCK TestPage 179: redirectRenderPRP1Test
 									renderRedirect = true;
-									viewIdRenderParameterValue = URLDecoder.decode(viewIdRenderParameterValue,
-											StringPool.UTF8);
+									viewIdRenderParameterValue = URLDecoder.decode(viewIdRenderParameterValue, "UTF-8");
 
 									BridgeURI redirectURI = bridgeURIFactory.getBridgeURI(viewIdRenderParameterValue);
 									UIViewRoot viewRoot = facesContext.getViewRoot();
@@ -619,7 +624,6 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 	public void release() {
 		this.attributeMap = null;
 		this.bridgeConfig = null;
-		this.bridgeRequestScopePreserved = null;
 		this.bridgeRequestScope = null;
 		this.bridgeURLFactory = null;
 		this.configuredFacesServletMappings = null;
@@ -667,25 +671,11 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 		return bridgeRequestScope;
 	}
 
-	public void setBridgeRequestScopePreserved(boolean bridgeRequestScopePreserved) {
-		this.bridgeRequestScopePreserved = bridgeRequestScopePreserved;
-	}
-
-	@Override
-	public boolean isBridgeRequestScopePreserved() {
-
-		if (bridgeRequestScopePreserved == null) {
-			bridgeRequestScopePreserved = PortletConfigParam.BridgeRequestScopePreserved.getBooleanValue(portletConfig);
-		}
-
-		return bridgeRequestScopePreserved;
-	}
-
 	@Override
 	public String getDefaultRenderKitId() {
 
 		if (defaultRenderKitId == null) {
-			String attributeName = Bridge.BRIDGE_PACKAGE_PREFIX + portletConfig.getPortletName() + StringPool.PERIOD +
+			String attributeName = Bridge.BRIDGE_PACKAGE_PREFIX + portletConfig.getPortletName() + "." +
 				Bridge.DEFAULT_RENDERKIT_ID;
 			defaultRenderKitId = (String) portletContext.getAttribute(attributeName);
 		}
@@ -725,7 +715,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 			String navigationQueryString = null;
 
 			if (fullViewId != null) {
-				int pos = fullViewId.indexOf(StringPool.QUESTION);
+				int pos = fullViewId.indexOf("?");
 
 				if (pos > 0) {
 					navigationQueryString = fullViewId.substring(pos + 1);
@@ -790,7 +780,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 				if (viewPath != null) {
 
 					// If present, remove the query string from the specified viewPath.
-					int pos = viewPath.indexOf(StringPool.QUESTION);
+					int pos = viewPath.indexOf("?");
 
 					if (pos > 0) {
 						viewPath = viewPath.substring(0, pos);
@@ -892,7 +882,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 					// within the filesystem of this context.
 					for (String defaultSuffix : configuredSuffixes) {
 
-						int pos = viewPath.lastIndexOf(StringPool.PERIOD);
+						int pos = viewPath.lastIndexOf(".");
 
 						if (pos > 0) {
 
@@ -947,7 +937,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 
 		String value = (String) getPortletRequest().getAttribute(name);
 
-		if ((value != null) && (value.contains(StringPool.COLON))) {
+		if ((value != null) && (value.contains(":") || value.contains("%3A") || value.contains("%253A"))) {
 
 			logger.warn("Invalid character in request attribute {0}=[{1}]", name, value);
 			value = null;
@@ -960,7 +950,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 
 		String value = getPortletRequest().getParameter(name);
 
-		if ((value != null) && (value.contains(StringPool.COLON))) {
+		if ((value != null) && (value.contains(":") || value.contains("%3A") || value.contains("%253A"))) {
 
 			logger.warn("Invalid character in request parameter {0}=[{1}]", name, value);
 			value = null;
@@ -1216,7 +1206,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 			else if (facesView.isPathMapped()) {
 				requestServletPath = facesView.getViewId();
 
-				int pos = requestServletPath.lastIndexOf(StringPool.FORWARD_SLASH + StringPool.STAR);
+				int pos = requestServletPath.lastIndexOf("/*");
 
 				if (pos >= 0) {
 					requestServletPath = requestServletPath.substring(0, pos);
@@ -1229,7 +1219,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 			// Otherwise, since there is no servlet-mapping, return an empty string. This is not required by the spec
 			// but seems to work in a Facelets environment where there is no servlet-mapping.
 			else {
-				requestServletPath = StringPool.BLANK;
+				requestServletPath = "";
 				logger.debug("requestServletPath=[{0}] servletMapping=[NONE] viewId=[{1}]", requestServletPath, viewId);
 			}
 
@@ -1246,14 +1236,12 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 			StringBuilder buf = new StringBuilder();
 			PortletRequest portletRequest = getPortletRequest();
 			buf.append(portletRequest.getScheme());
-			buf.append(StringPool.COLON);
-			buf.append(StringPool.FORWARD_SLASH);
-			buf.append(StringPool.FORWARD_SLASH);
+			buf.append("://");
 			buf.append(portletRequest.getServerName());
-			buf.append(StringPool.COLON);
+			buf.append(":");
 			buf.append(portletRequest.getServerPort());
 			buf.append(portletRequest.getContextPath());
-			buf.append(StringPool.QUESTION);
+			buf.append("?");
 			buf.append(getRequestQueryString(portletRequest));
 			requestURL = buf.toString();
 		}
@@ -1295,7 +1283,7 @@ public class BridgeContextImpl extends BridgeContextCompatImpl {
 	public boolean isPreserveActionParams() {
 
 		if (preserveActionParams == null) {
-			String initParamName = Bridge.BRIDGE_PACKAGE_PREFIX + portletConfig.getPortletName() + StringPool.PERIOD +
+			String initParamName = Bridge.BRIDGE_PACKAGE_PREFIX + portletConfig.getPortletName() + "." +
 				Bridge.PRESERVE_ACTION_PARAMS;
 			Object initParamValue = portletContext.getAttribute(initParamName);
 

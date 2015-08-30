@@ -13,8 +13,6 @@
  */
 package com.liferay.faces.bridge.scope.internal;
 
-import javax.faces.FacesException;
-
 import com.liferay.faces.bridge.scope.BridgeRequestScopeManager;
 import com.liferay.faces.bridge.scope.BridgeRequestScopeManagerFactory;
 
@@ -25,7 +23,7 @@ import com.liferay.faces.bridge.scope.BridgeRequestScopeManagerFactory;
 public class BridgeRequestScopeManagerFactoryImpl extends BridgeRequestScopeManagerFactory {
 
 	@Override
-	public BridgeRequestScopeManager getBridgeRequestScopeManager() throws FacesException {
+	public BridgeRequestScopeManager getBridgeRequestScopeManager() {
 
 		BridgeRequestScopeManager bridgeRequestScopeManager = null;
 

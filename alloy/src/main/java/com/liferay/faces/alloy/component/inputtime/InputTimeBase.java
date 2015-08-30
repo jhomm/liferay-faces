@@ -29,7 +29,7 @@ public abstract class InputTimeBase extends InputDateTime implements Styleable, 
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.inputtime.InputTime";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputtime.internal.InputTimeRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputtime.InputTimeRenderer";
 
 	// Protected Enumerations
 	protected enum InputTimePropertyKeys {
@@ -41,13 +41,12 @@ public abstract class InputTimeBase extends InputDateTime implements Styleable, 
 		maxResults,
 		maxTime,
 		minTime,
+		nativeWhenMobile,
 		pattern,
 		queryDelay,
-		responsive,
 		scrollIntoView,
 		step,
-		styleClass,
-		timeSelectListener
+		styleClass
 	}
 
 	public InputTimeBase() {
@@ -119,6 +118,14 @@ public abstract class InputTimeBase extends InputDateTime implements Styleable, 
 		getStateHelper().put(InputTimePropertyKeys.minTime, minTime);
 	}
 
+	public boolean isNativeWhenMobile() {
+		return (Boolean) getStateHelper().eval(InputTimePropertyKeys.nativeWhenMobile, true);
+	}
+
+	public void setNativeWhenMobile(boolean nativeWhenMobile) {
+		getStateHelper().put(InputTimePropertyKeys.nativeWhenMobile, nativeWhenMobile);
+	}
+
 	public String getPattern() {
 		return (String) getStateHelper().eval(InputTimePropertyKeys.pattern, "hh:mm a");
 	}
@@ -133,14 +140,6 @@ public abstract class InputTimeBase extends InputDateTime implements Styleable, 
 
 	public void setQueryDelay(Integer queryDelay) {
 		getStateHelper().put(InputTimePropertyKeys.queryDelay, queryDelay);
-	}
-
-	public boolean isResponsive() {
-		return (Boolean) getStateHelper().eval(InputTimePropertyKeys.responsive, true);
-	}
-
-	public void setResponsive(boolean responsive) {
-		getStateHelper().put(InputTimePropertyKeys.responsive, responsive);
 	}
 
 	public Boolean getScrollIntoView() {
@@ -171,14 +170,6 @@ public abstract class InputTimeBase extends InputDateTime implements Styleable, 
 	@Override
 	public void setStyleClass(String styleClass) {
 		getStateHelper().put(InputTimePropertyKeys.styleClass, styleClass);
-	}
-
-	public javax.el.MethodExpression getTimeSelectListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(InputTimePropertyKeys.timeSelectListener, null);
-	}
-
-	public void setTimeSelectListener(javax.el.MethodExpression timeSelectListener) {
-		getStateHelper().put(InputTimePropertyKeys.timeSelectListener, timeSelectListener);
 	}
 }
 //J+

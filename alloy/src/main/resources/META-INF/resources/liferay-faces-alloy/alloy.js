@@ -60,7 +60,6 @@ LFAI = {
 			var contentTypeArray = A.Array(contentTypes),
 				escapedClientId = LFA.escapeClientId(clientId),
 				escapedFormClientId = LFA.escapeClientId(formClientId),
-				options = { execute : '@none', render : render},
 				uploadComplete = false;
 
 			A.Uploader.HTML5FILEFIELD_TEMPLATE =
@@ -96,11 +95,14 @@ LFAI = {
 				}
 			});
 
-			if (namingContainerId) {
-				options['com.sun.faces.namingContainerId'] = namingContainerId;
-			}
-
 			clientComponent.on('uploadcomplete', function() {
+
+				var options = { execute : '@none', render : render };
+
+				if (namingContainerId) {
+					options['com.sun.faces.namingContainerId'] = namingContainerId;
+				}
+
 				jsf.ajax.request(clientId, 'valueChange', options);
 			});
 
@@ -217,7 +219,7 @@ LFAI = {
 		var dataTable = A.one('#' + escapedDataTableId),
 		selectAllCheckbox = A.one('#' + escapedSelectAllCheckboxId);
 
-		selectAllCheckbox.on('change', function() {
+		selectAllCheckbox.on('change', function(event) {
 
 			var checkboxes = dataTable.one('tbody').all('input[type=checkbox]'),
 				rowIndexRange = null;
@@ -238,7 +240,7 @@ LFAI = {
 						checkbox.removeClass('preventClientBehavior');
 					}
 				});
-				rowSelectRangeClientBehavior(rowIndexRange);
+				rowSelectRangeClientBehavior(rowIndexRange, event);
 			}
 			else {
 				checkboxes.each(function(checkbox) {
@@ -256,7 +258,7 @@ LFAI = {
 						checkbox.removeClass('preventClientBehavior');
 					}
 				});
-				rowDeselectRangeClientBehavior(rowIndexRange);
+				rowDeselectRangeClientBehavior(rowIndexRange, event);
 			}
 		});
 	},
@@ -269,7 +271,7 @@ LFAI = {
 
 		checkboxes.each(
 			function(checkbox) {
-				checkbox.on('click', function(e) {
+				checkbox.on('click', function(event) {
 					var found = false,
 						hiddenField = A.one('#' + escapedHiddenFieldClientId),
 						hiddenFieldValue = hiddenField.get('value'),
@@ -310,13 +312,13 @@ LFAI = {
 					if (checkbox.get('checked')) {
 						checkbox.ancestor("tr").addClass('info');
 						if (!checkbox.hasClass('preventClientBehavior')) {
-							rowSelectClientBehavior(rowIndex);
+							rowSelectClientBehavior(rowIndex, event);
 						}
 					}
 					else {
 						checkbox.ancestor("tr").removeClass('info');
 						if (!checkbox.hasClass('preventClientBehavior')) {
-							rowDeselectClientBehavior(rowIndex);
+							rowDeselectClientBehavior(rowIndex, event);
 						}
 					}
 				});
@@ -436,8 +438,19 @@ LFAI = {
 		}
 	},
 
+	initProgressBar: function(progressBar) {
+
+		var orientation = progressBar.get('orientation');
+
+		if ('vertical' === orientation) {
+			var progressBarLabel = progressBar.get('contentBox').one('*');
+			progressBarLabel.removeAttribute('style');
+		}
+	},
+
 	initProgressBarServerMode: function(progressBar, clientId, pollingDelay, clientBehaviorsForPolling) {
 
+		LFAI.initProgressBar(progressBar);
 		var hiddenClientId = clientId + '_hidden';
 
 		// Define the start() method for progressBar which starts polling the server for progress.
@@ -500,6 +513,7 @@ LFAI = {
 	// Initilize a consistent API for progressBar when ajax is not enabled.
 	initProgressBarClientMode: function(progressBar) {
 
+		LFAI.initProgressBar(progressBar);
 		progressBar.startPolling = function() {
 			// no-op
 		};

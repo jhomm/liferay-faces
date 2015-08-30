@@ -14,8 +14,6 @@
 package com.liferay.faces.bridge.bean.internal;
 
 import com.liferay.faces.util.config.FacesConfig;
-import com.liferay.faces.util.product.ProductConstants;
-import com.liferay.faces.util.product.ProductMap;
 
 
 /**
@@ -23,23 +21,10 @@ import com.liferay.faces.util.product.ProductMap;
  */
 public class BeanManagerFactoryImpl extends BeanManagerFactory {
 
-	// Private Constants
-	private static final boolean MOJARRA_DETECTED = ProductMap.getInstance().get(ProductConstants.JSF).getTitle()
-		.equals(ProductConstants.MOJARRA);
-
 	@Override
 	public BeanManager getBeanManager(FacesConfig facesConfig) {
 
-		BeanManager beanManager = null;
-
-		if (MOJARRA_DETECTED) {
-			beanManager = new BeanManagerMojarraImpl(facesConfig.getConfiguredManagedBeans());
-		}
-		else {
-			beanManager = new BeanManagerImpl(facesConfig.getConfiguredManagedBeans());
-		}
-
-		return beanManager;
+		return new BeanManagerImpl(facesConfig.getConfiguredManagedBeans());
 	}
 
 	public BeanManagerFactory getWrapped() {

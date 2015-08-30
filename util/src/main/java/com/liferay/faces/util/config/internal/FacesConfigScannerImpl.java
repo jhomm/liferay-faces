@@ -13,10 +13,6 @@
  */
 package com.liferay.faces.util.config.internal;
 
-import com.liferay.faces.util.config.ConfiguredServlet;
-import com.liferay.faces.util.config.ConfiguredServletMapping;
-import com.liferay.faces.util.config.FacesConfig;
-import com.liferay.faces.util.config.WebConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -29,7 +25,10 @@ import javax.faces.application.ViewHandler;
 import javax.faces.webapp.FacesServlet;
 import javax.xml.parsers.SAXParser;
 
-import com.liferay.faces.util.lang.StringPool;
+import com.liferay.faces.util.config.ConfiguredServlet;
+import com.liferay.faces.util.config.ConfiguredServletMapping;
+import com.liferay.faces.util.config.FacesConfig;
+import com.liferay.faces.util.config.WebConfig;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -50,14 +49,15 @@ public class FacesConfigScannerImpl implements FacesConfigScanner {
 	private static final String MOJARRA_CONFIG_PATH = "com/sun/faces/jsf-ri-runtime.xml";
 
 	// Private Data Members
+	private ClassLoader classLoader;
 	private boolean resolveEntities;
-
 	private ResourceReader resourceReader;
 	private SAXParser saxParser;
 	private WebConfig webConfig;
 
 	public FacesConfigScannerImpl(ClassLoader classLoader, ResourceReader resourceReader, SAXParser saxParser,
 		boolean resolveEntities, WebConfig webConfig) {
+		this.classLoader = classLoader;
 		this.saxParser = saxParser;
 		this.resourceReader = resourceReader;
 		this.resolveEntities = resolveEntities;
@@ -107,7 +107,7 @@ public class FacesConfigScannerImpl implements FacesConfigScanner {
 			defaultSuffixParam = ViewHandler.DEFAULT_SUFFIX;
 		}
 
-		List<String> configuredSuffixes = Arrays.asList(defaultSuffixParam.split(StringPool.SPACE));
+		List<String> configuredSuffixes = Arrays.asList(defaultSuffixParam.split(" "));
 
 		// If they don't exist explicitly in web.xml, then setup implicit servlet-mapping entries to the default
 		// suffixes.
@@ -126,9 +126,9 @@ public class FacesConfigScannerImpl implements FacesConfigScanner {
 			}
 
 			if (!found) {
-				String urlPattern = StringPool.STAR + configuredSuffix;
+				String urlPattern = "*" + configuredSuffix;
 				ConfiguredServletMapping implicitFacesServletMapping = new ConfiguredServletMappingImpl(FACES_SERVLET,
-						urlPattern);
+						urlPattern, true);
 				facesServletMappings.add(implicitFacesServletMapping);
 				logger.debug("Added implicit extension-mapped servlet-mapping for urlPattern=[{0}]", urlPattern);
 			}
@@ -138,11 +138,10 @@ public class FacesConfigScannerImpl implements FacesConfigScanner {
 
 		try {
 
-			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 			FacesConfigDescriptorParser facesConfigDescriptorParser = newFacesConfigDescriptorParser();
 
 			// Parse the WEB-INF/faces-config.xml descriptor. Gathering absolute-ordering, if any.
-			FacesConfigDescriptor webInfFacesConfigDescriptor = null;
+			FacesConfigDescriptor webInfFacesConfigDescriptor;
 			InputStream inputStream = resourceReader.getResourceAsStream(FACES_CONFIG_WEB_INF_PATH);
 			webInfFacesConfigDescriptor = facesConfigDescriptorParser.parse(inputStream, FACES_CONFIG_WEB_INF_PATH);
 			inputStream.close();
@@ -199,31 +198,13 @@ public class FacesConfigScannerImpl implements FacesConfigScanner {
 					FacesConfigDescriptor facesConfigDescriptor = facesConfigDescriptorParser.parse(inputStream,
 							facesConfigURL);
 
-					// If the name is not set, then the <name> element was omitted. In JSF 2.x the <name> element is
-					// optional, and it JSF 1.x <name> element is not permitted by the XML Schema. Regardless, use the
-					// URL as the name in order to uniquely identify the configuration.
-					String facesConfigName = facesConfigDescriptor.getName();
-
-					if (facesConfigName == null) {
-
-						// Example #1 (JRebel ClassLoader URL):
-						// file:/Projects/liferay-faces/bridge-impl/target/classes/META-INF/faces-config.xml
-						// Example #2 (Typical ClassLoader URL):
-						// jar:file:/Servers/liferay-portal/tomcat/webapps/WEB-INF/lib/liferay-faces-bridge-impl.jar!/META-INF/faces-config.xml
-						facesConfigName = facesConfigURL.toString();
-					}
-
 					facesConfigDescriptors.add(facesConfigDescriptor);
-					facesConfigName = null;
 
 					inputStream.close();
-
 				}
 
 				// Sort the faces configuration files in accord with
 				// javax.faces-api-2.2-FINAL_JSF_20130320_11.4.8_Ordering_of_Artifacts
-				logger.debug("re-ordering artifacts ...");
-
 				List<FacesConfigDescriptor> orderedConfigs = getOrderedConfigs(facesConfigDescriptors,
 						webInfFacesConfigDescriptor);
 
@@ -278,38 +259,27 @@ public class FacesConfigScannerImpl implements FacesConfigScanner {
 		return new FacesConfigParserImpl(saxParser, resolveEntities);
 	}
 
-	private List<FacesConfigDescriptor> getOrderedConfigs(List<FacesConfigDescriptor> facesConfigDescriptors,
+	protected List<FacesConfigDescriptor> getOrderedConfigs(List<FacesConfigDescriptor> facesConfigDescriptors,
 		FacesConfigDescriptor webInfFacesConfig) throws Exception {
-
-		List<String> absoluteOrdering = webInfFacesConfig.getAbsoluteOrdering();
 
 		if (facesConfigDescriptors.size() > 1) {
 
+			List<String> absoluteOrdering = webInfFacesConfig.getAbsoluteOrdering();
+
 			if (absoluteOrdering == null) {
-				logger.debug("getOrderedConfigs: absoluteOrdering == null ...");
-				facesConfigDescriptors = Ordering.getOrder(facesConfigDescriptors);
+				logger.debug("Ordering faces-config descriptors");
+				facesConfigDescriptors = OrderingUtil.getOrder(facesConfigDescriptors);
 			}
 			else {
-				facesConfigDescriptors = Ordering.getOrder(facesConfigDescriptors, absoluteOrdering);
+				logger.debug("Ordering faces-config descriptors: absoluteOrdering=[{0}]", absoluteOrdering);
+				facesConfigDescriptors = OrderingUtil.getOrder(facesConfigDescriptors, absoluteOrdering);
 			}
 		}
 
 		return facesConfigDescriptors;
 	}
 
-	protected ResourceReader getResourceReader() {
-		return resourceReader;
-	}
-
-	protected boolean isResolveEntities() {
-		return resolveEntities;
-	}
-
 	protected SAXParser getSAXParser() {
 		return saxParser;
-	}
-
-	protected WebConfig getWebConfig() {
-		return webConfig;
 	}
 }

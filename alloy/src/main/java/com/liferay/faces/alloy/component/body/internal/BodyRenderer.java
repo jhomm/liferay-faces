@@ -16,12 +16,17 @@ package com.liferay.faces.alloy.component.body.internal;
 import java.io.IOException;
 
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.context.PartialViewContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
 import com.liferay.faces.alloy.component.body.Body;
+import com.liferay.faces.util.client.BrowserSniffer;
+import com.liferay.faces.util.client.BrowserSnifferFactory;
+import com.liferay.faces.util.factory.FactoryExtensionFinder;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.product.Product;
@@ -76,7 +81,14 @@ public class BodyRenderer extends BodyRendererBase {
 		}
 		else {
 			ResponseWriter responseWriter = facesContext.getResponseWriter();
-			BodyResponseWriter delegationResponseWriter = new BodyResponseWriter(responseWriter);
+			BrowserSnifferFactory browserSnifferFactory = (BrowserSnifferFactory) FactoryExtensionFinder.getFactory(
+					BrowserSnifferFactory.class);
+			ExternalContext externalContext = facesContext.getExternalContext();
+			BrowserSniffer browserSniffer = browserSnifferFactory.getBrowserSniffer(externalContext);
+			PartialViewContext partialViewContext = facesContext.getPartialViewContext();
+			boolean ajaxRequest = partialViewContext.isAjaxRequest();
+			BodyResponseWriter delegationResponseWriter = new BodyResponseWriter(responseWriter, browserSniffer,
+					ajaxRequest);
 			super.encodeEnd(facesContext, uiComponent, delegationResponseWriter);
 		}
 	}

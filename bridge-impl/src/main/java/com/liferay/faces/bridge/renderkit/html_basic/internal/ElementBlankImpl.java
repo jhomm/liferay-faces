@@ -13,9 +13,6 @@
  */
 package com.liferay.faces.bridge.renderkit.html_basic.internal;
 
-import com.liferay.faces.util.lang.StringPool;
-
-
 /**
  * This implementation is a special case that is meant to be used when JSF component renderers do not properly call
  * startElement() first. It represents a pseudo-element that has has a blank (empty string) node name.
@@ -25,7 +22,7 @@ import com.liferay.faces.util.lang.StringPool;
 public class ElementBlankImpl extends ElementImpl {
 
 	public ElementBlankImpl() {
-		super(StringPool.BLANK);
+		super("");
 	}
 
 	@Override

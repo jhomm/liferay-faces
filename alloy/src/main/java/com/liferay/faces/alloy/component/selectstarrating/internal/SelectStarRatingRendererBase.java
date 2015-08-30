@@ -14,16 +14,10 @@
 package com.liferay.faces.alloy.component.selectstarrating.internal;
 //J-
 
-import java.io.IOException;
 
 import javax.annotation.Generated;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
 
-import com.liferay.faces.alloy.component.selectstarrating.SelectStarRating;
-
-import com.liferay.faces.alloy.render.internal.DelegatingAlloyRendererBase;
+import com.liferay.faces.alloy.component.selectrating.internal.SelectRatingRenderer;
 
 
 /**
@@ -31,50 +25,10 @@ import com.liferay.faces.alloy.render.internal.DelegatingAlloyRendererBase;
  * @author	Kyle Stiemann
  */
 @Generated(value = "com.liferay.alloy.tools.builder.FacesBuilder")
-public abstract class SelectStarRatingRendererBase extends DelegatingAlloyRendererBase {
+public abstract class SelectStarRatingRendererBase extends SelectRatingRenderer {
 
 	// Protected Constants
 	protected static final String CLIENT_KEY = "clientKey";
 	protected static final String STYLE_CLASS = "styleClass";
-
-	// Private Constants
-	private static final String ALLOY_CLASS_NAME = "Rating";
-	private static final String ALLOY_MODULE_NAME = "aui-rating";
-
-	// Modules
-	protected static final String[] MODULES = {ALLOY_MODULE_NAME};
-
-	@Override
-	public void encodeAlloyAttributes(FacesContext facesContext, ResponseWriter responseWriter, UIComponent uiComponent) throws IOException {
-
-		SelectStarRating selectStarRating = (SelectStarRating) uiComponent;
-		boolean first = true;
-
-		encodeHiddenAttributes(facesContext, responseWriter, selectStarRating, first);
-	}
-
-	@Override
-	public String getAlloyClassName(FacesContext facesContext, UIComponent uiComponent) {
-		return ALLOY_CLASS_NAME;
-	}
-
-	@Override
-	protected String[] getModules(FacesContext facesContext, UIComponent uiComponent) {
-		return MODULES;
-	}
-
-	protected void encodeHiddenAttributes(FacesContext facesContext, ResponseWriter responseWriter, SelectStarRating selectStarRating, boolean first) throws IOException {
-		// no-op
-	}
-
-	@Override
-	public String getDelegateComponentFamily() {
-		return SelectStarRating.COMPONENT_FAMILY;
-	}
-
-	@Override
-	public String getDelegateRendererType() {
-		return "javax.faces.Radio";
-	}
 }
 //J+

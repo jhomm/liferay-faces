@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.liferay.faces.demos.dto.CodeExample;
-import com.liferay.faces.util.lang.StringPool;
 
 
 /**
@@ -69,43 +68,59 @@ public class CodeExampleUtil {
 			if (sourceFileName.endsWith(JAVA_EXTENSION)) {
 
 				fileExtension = JAVA;
+
 				Matcher matcher = JAVA_MULTILINE_COMMENTS_PATTERN.matcher(sourceCodeText);
-				sourceCodeText = matcher.replaceAll(StringPool.BLANK);
+				sourceCodeText = matcher.replaceAll("");
 			}
 			else {
 
 				// Reset the stringBuilder
 				stringBuilder.setLength(0);
 				fileExtension = XML;
-				sourceCodeText = TEMPLATE_ATTRIBUTE_PATTERN.matcher(sourceCodeText).replaceAll(StringPool.BLANK);
-				sourceCodeText = SHOWCASE_NAMESPACE_PATTERN.matcher(sourceCodeText).replaceAll(StringPool.BLANK);
+				sourceCodeText = TEMPLATE_ATTRIBUTE_PATTERN.matcher(sourceCodeText).replaceFirst("");
+				sourceCodeText = SHOWCASE_NAMESPACE_PATTERN.matcher(sourceCodeText).replaceAll("");
 
 				StringReader stringReader = new StringReader(sourceCodeText);
 				BufferedReader bufferedReader = new BufferedReader(stringReader);
 				int trimTab = 0;
 				String line;
 				boolean ignoreNextLine = false;
+				int defineCount = 0;
 
 				while ((line = bufferedReader.readLine()) != null) {
 					String trimmedLine = line.trim();
 
 					if (ignoreNextLine) {
-						ignoreNextLine = !trimmedLine.endsWith(StringPool.GREATER_THAN);
+						ignoreNextLine = !trimmedLine.endsWith(">");
 					}
 					else {
 
-						if (trimmedLine.startsWith("<showcase") || trimmedLine.startsWith("<ui:define")) {
-							trimTab++;
-							ignoreNextLine = !trimmedLine.endsWith(StringPool.GREATER_THAN);
+						boolean defineColOpen = trimmedLine.startsWith("<ui:define name=\"col");
+
+						if (!defineColOpen && trimmedLine.startsWith("<ui:define")) {
+							defineCount++;
 						}
-						else if (trimmedLine.startsWith("</showcase") || trimmedLine.startsWith("</ui:define")) {
+
+						boolean defineClose = trimmedLine.startsWith("</ui:define");
+						boolean defineColClose = ((defineCount == 0) && defineClose);
+
+						if (defineClose && !defineColClose) {
+							defineCount--;
+						}
+
+						if (trimmedLine.startsWith("<showcase") || defineColOpen) {
+							trimTab++;
+							ignoreNextLine = !trimmedLine.endsWith(">");
+
+						}
+						else if (trimmedLine.startsWith("</showcase") || defineColClose) {
 							trimTab--;
 						}
 						else {
 
 							for (int i = 0; i < trimTab; i++) {
 
-								if (line.startsWith(StringPool.TAB)) {
+								if (line.startsWith("\t")) {
 									line = line.substring(1);
 								}
 							}
@@ -144,7 +159,7 @@ public class CodeExampleUtil {
 
 							if (!matcher.matches()) {
 								stringBuilder.append(line);
-								stringBuilder.append(StringPool.NEW_LINE);
+								stringBuilder.append("\n");
 							}
 						}
 					}

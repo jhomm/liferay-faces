@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.faces.context.ExternalContext;
@@ -29,9 +30,10 @@ import javax.portlet.PortletRequest;
 import com.liferay.faces.bridge.BridgeFactoryFinder;
 import com.liferay.faces.bridge.bean.internal.BeanManager;
 import com.liferay.faces.bridge.bean.internal.BeanManagerFactory;
+import com.liferay.faces.bridge.bean.internal.PreDestroyInvoker;
+import com.liferay.faces.bridge.bean.internal.PreDestroyInvokerFactory;
 import com.liferay.faces.bridge.config.internal.PortletConfigParam;
 import com.liferay.faces.bridge.context.BridgeContext;
-import com.liferay.faces.bridge.internal.BridgeConstants;
 import com.liferay.faces.bridge.scope.BridgeRequestScope;
 import com.liferay.faces.util.config.ApplicationConfig;
 import com.liferay.faces.util.map.AbstractPropertyMap;
@@ -67,6 +69,7 @@ public class RequestScopeMap extends AbstractPropertyMap<Object> {
 	private boolean distinctRequestScopedManagedBeans;
 	private String namespace;
 	private PortletRequest portletRequest;
+	private PreDestroyInvoker preDestroyInvoker;
 	private boolean preferPreDestroy;
 	private Set<String> removedAttributeNames;
 
@@ -100,6 +103,13 @@ public class RequestScopeMap extends AbstractPropertyMap<Object> {
 		// over the @BridgePreDestroy annotation.
 		this.preferPreDestroy = PortletConfigParam.PreferPreDestroy.getBooleanValue(portletConfig);
 
+		ContextMapFactory contextMapFactory = (ContextMapFactory) BridgeFactoryFinder.getFactory(
+				ContextMapFactory.class);
+		Map<String, Object> applicationScopeMap = contextMapFactory.getApplicationScopeMap(bridgeContext);
+		PreDestroyInvokerFactory preDestroyInvokerFactory = (PreDestroyInvokerFactory) BridgeFactoryFinder.getFactory(
+				PreDestroyInvokerFactory.class);
+		this.preDestroyInvoker = preDestroyInvokerFactory.getPreDestroyInvoker(applicationScopeMap);
+
 		BridgeRequestScope bridgeRequestScope = bridgeContext.getBridgeRequestScope();
 
 		if (bridgeRequestScope != null) {
@@ -122,7 +132,7 @@ public class RequestScopeMap extends AbstractPropertyMap<Object> {
 		Object potentialManagedBeanValue = super.remove(key);
 
 		if (beanManager.isManagedBean(keyAsString, potentialManagedBeanValue)) {
-			beanManager.invokePreDestroyMethods(potentialManagedBeanValue, preferPreDestroy);
+			preDestroyInvoker.invokeAnnotatedMethods(potentialManagedBeanValue, preferPreDestroy);
 		}
 
 		return potentialManagedBeanValue;
@@ -143,8 +153,7 @@ public class RequestScopeMap extends AbstractPropertyMap<Object> {
 	protected Object getProperty(String name) {
 
 		if ((NULL_PATH_ATTRIBUTES) &&
-				(BridgeConstants.REQ_ATTR_PATH_INFO.equals(name) ||
-					BridgeConstants.REQ_ATTR_SERVLET_PATH.equals(name))) {
+				("javax.servlet.include.path_info".equals(name) || "javax.servlet.include.servlet_path".equals(name))) {
 			return null;
 		}
 		else {

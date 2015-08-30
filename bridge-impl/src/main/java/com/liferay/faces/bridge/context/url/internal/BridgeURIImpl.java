@@ -21,9 +21,7 @@ import java.util.Map;
 import javax.portlet.faces.Bridge;
 
 import com.liferay.faces.bridge.context.url.BridgeURI;
-import com.liferay.faces.bridge.internal.BridgeConstants;
 import com.liferay.faces.bridge.util.internal.URLUtil;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -108,15 +106,15 @@ public class BridgeURIImpl implements BridgeURI {
 
 			if (query != null) {
 
-				int ampersandPos = query.indexOf(StringPool.AMPERSAND);
+				int ampersandPos = query.indexOf("&");
 
 				while (ampersandPos > 0) {
 
 					String queryPart = query.substring(ampersandPos);
 
-					if (queryPart.startsWith(StringPool.AMPERSAND_ENCODED)) {
+					if (queryPart.startsWith("&amp;")) {
 						escaped = Boolean.TRUE;
-						ampersandPos = query.indexOf(StringPool.AMPERSAND, ampersandPos + 1);
+						ampersandPos = query.indexOf("&", ampersandPos + 1);
 					}
 					else {
 						escaped = Boolean.FALSE;
@@ -147,7 +145,7 @@ public class BridgeURIImpl implements BridgeURI {
 			String path = getPath();
 
 			if ((path != null) && (path.length() > 0) &&
-					(!path.startsWith(StringPool.FORWARD_SLASH) || path.startsWith(RELATIVE_PATH_PREFIX))) {
+					(!path.startsWith("/") || path.startsWith(RELATIVE_PATH_PREFIX))) {
 				pathRelative = Boolean.TRUE;
 			}
 
@@ -177,14 +175,13 @@ public class BridgeURIImpl implements BridgeURI {
 				}
 				else {
 
-					if (!stringValue.startsWith(StringPool.FORWARD_SLASH) &&
-							!stringValue.startsWith(RELATIVE_PATH_PREFIX)) {
+					if (!stringValue.startsWith("/") && !stringValue.startsWith(RELATIVE_PATH_PREFIX)) {
 						external = Boolean.TRUE;
 					}
 				}
 			}
 
-			if (stringValue.startsWith(BridgeConstants.WSRP_REWRITE)) {
+			if (stringValue.startsWith("wsrp_rewrite")) {
 				external = Boolean.FALSE;
 			}
 		}
@@ -198,7 +195,7 @@ public class BridgeURIImpl implements BridgeURI {
 
 			hierarchical = Boolean.FALSE;
 
-			if ((isAbsolute() && uri.getSchemeSpecificPart().startsWith(StringPool.FORWARD_SLASH)) || isRelative()) {
+			if ((isAbsolute() && uri.getSchemeSpecificPart().startsWith("/")) || isRelative()) {
 				hierarchical = Boolean.TRUE;
 			}
 		}

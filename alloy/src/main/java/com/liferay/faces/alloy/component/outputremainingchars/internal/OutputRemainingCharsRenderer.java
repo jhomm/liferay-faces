@@ -25,8 +25,6 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 
 import com.liferay.faces.alloy.component.outputremainingchars.OutputRemainingChars;
-import com.liferay.faces.util.component.ComponentUtil;
-import com.liferay.faces.util.lang.StringPool;
 
 
 /**
@@ -55,7 +53,7 @@ public class OutputRemainingCharsRenderer extends OutputRemainingCharsRendererBa
 
 		ResponseWriter responseWriter = facesContext.getResponseWriter();
 		OutputRemainingChars outputRemainingChars = (OutputRemainingChars) uiComponent;
-		String clientVarName = ComponentUtil.getClientVarName(facesContext, outputRemainingChars);
+		String clientVarName = getClientVarName(facesContext, outputRemainingChars);
 		String clientKey = outputRemainingChars.getClientKey();
 
 		if (clientKey == null) {
@@ -69,12 +67,12 @@ public class OutputRemainingCharsRenderer extends OutputRemainingCharsRendererBa
 			encodeLiferayComponentVar(responseWriter, clientVarName, clientKey);
 
 			if (onMaxlengthReached != null) {
-				encodeEventCallback(responseWriter, clientVarName, StringPool.ON, ALLOY_MAX_LENGTH_EVENT_NAME,
+				encodeEventCallback(responseWriter, clientVarName, "on", ALLOY_MAX_LENGTH_EVENT_NAME,
 					onMaxlengthReached);
 			}
 
 			if (onceMaxlengthReached != null) {
-				encodeEventCallback(responseWriter, clientVarName, StringPool.ONCE, ALLOY_MAX_LENGTH_EVENT_NAME,
+				encodeEventCallback(responseWriter, clientVarName, "once", ALLOY_MAX_LENGTH_EVENT_NAME,
 					onceMaxlengthReached);
 			}
 		}

@@ -3,15 +3,18 @@
 	template="/WEB-INF/templates/component-1col-80.xhtml">
 
 	<ui:define name="col1">
+
+		<!-- The enclosing form must have enctype="multipart/form-data" in order for files to upload correctly. -->
 		<alloy:form enctype="multipart/form-data">
 			<showcase:example description="#{i18n['alloy-inputfile-validation-example']}">
 				<alloy:messages layout="table" />
-				<alloy:inputFile fileUploadListener="#{inputFileBackingBean.handleFileUpload}" multiple="multiple"
-					showPreview="true">
-					<alloy:validateFile contentTypes="application/pdf,image/png" maxFileSize="600000" />
-				</alloy:inputFile>
+				<alloy:inputFile contentTypes="application/pdf,image/png"
+					fileUploadListener="#{inputFileBackingBean.handleFileUpload}" maxFileSize="600000"
+					multiple="multiple" showPreview="true" />
 				<hr />
-				<alloy:commandButton render="@form" value="#{i18n['submit']}" />
+
+				<!-- Note: ajax="true" works in JSF 2.2 -->
+				<alloy:commandButton ajax="false" value="#{i18n['submit']}" />
 			</showcase:example>
 			<showcase:outputModel>
 				<ui:include src="../inputFileCommon.xhtml" />

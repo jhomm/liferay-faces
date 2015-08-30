@@ -607,7 +607,7 @@
 		</attributes>
 	</component>
 	<component name="InputDateTimeCommon"
-		extendsTags="AltInherited DisabledInherited FacesMessageLabelInherited InputCommon SizeInherited"
+		extendsTags="AltInherited DisabledInherited FacesMessageLabelInheritedGenerateJavaFalse InputCommon SizeInherited"
 		generateJava="false" generateTaglibXML="false">
 		<!-- This component exists so that InputDate and InputTime can extend it. It includes all the attributes of -->
 		<!-- InputDateTime with <generateJava>false</generateJava>. If InputDate and InputTime extended -->
@@ -643,7 +643,7 @@
 				<description>
 					<![CDATA[When true, the component will render an HTML5 <code>&lt;input type="date" /&gt;</code> element on small/mobile displays in order to enable selection of a date with the mobile device's native UI. The default is true.]]>
 				</description>
-				<name>responsive</name>
+				<name>nativeWhenMobile</name>
 				<type>boolean</type>
 			</attribute>
 			<attribute>
@@ -676,7 +676,7 @@
 		generateTaglibXML="false">
 		<attributes>
 			<attribute>
-				<defaultValue>com.liferay.faces.util.lang.StringPool.RIGHT</defaultValue>
+				<defaultValue>"right"</defaultValue>
 				<description>
 					<![CDATA[Indicates the side of the associated component where the tooltip should appear ("right", "left", "top", "bottom"). Default is "right".]]>
 				</description>
@@ -736,7 +736,7 @@
 	</component>
 	<!-- /Common -->
 	<!-- /generateTaglibXML="false" tags for common attributes -->
-	<component name="Accordion" extendsTags="ClientComponent UIData Styleable UIComponentBase" handlerClass="com.liferay.faces.alloy.component.accordion.internal.AccordionHandler"
+	<component name="Accordion" extendsTags="ClientComponent UIData Styleable UIComponentBase"
 		module="aui-toggler" parentClass="javax.faces.component.UIData" yui="true" yuiName="TogglerDelegate">
 		<description>
 			<![CDATA[Accordion is a UIData (iterator) component that renders child tabs either statically or dynamically.]]>
@@ -760,24 +760,6 @@
 				<type>java.lang.Integer</type>
 				<yui>false</yui>
 			</attribute>
-			<attribute>
-				<description>
-					<![CDATA[A method that is executed when a tab is clicked. The method must be <code>public</code>, return <code>void</code>, and take a <code>TabCollapseEvent</code> argument.]]>
-				</description>
-				<name>tabCollapseListener</name>
-				<method-signature>
-					void tabCollapseListener(com.liferay.faces.alloy.component.tab.TabCollapseEvent)
-				</method-signature>
-			</attribute>
-			<attribute>
-				<description>
-					<![CDATA[A method that is executed when a tab is clicked. The method must be <code>public</code>, return <code>void</code>, and take a <code>TabExpandEvent</code> argument.]]>
-				</description>
-				<name>tabExpandListener</name>
-				<method-signature>
-					void tabExpandListener(com.liferay.faces.alloy.component.tab.TabExpandEvent)
-				</method-signature>
-			</attribute>
 		</attributes>
 	</component>
 	<component name="Audio" extendsTags="AudioVideoCommon" parentClass="com.liferay.faces.alloy.component.media.Media" rendererParentClass="com.liferay.faces.alloy.component.media.internal.MediaRenderer">
@@ -795,9 +777,9 @@
 		</attributes>
 	</component>
 	<component name="AutoComplete" delegateRendererType="javax.faces.Text"
-		extendsTags="ClientComponent InputText"
+		extendsTags="ClientComponent FacesMessageLabelInheritedGenerateJavaFalse InputText"
 		handlerClass="com.liferay.faces.alloy.component.autocomplete.internal.AutoCompleteHandler"
-		parentClass="com.liferay.faces.alloy.component.inputtext.AbstractInputText"
+		parentClass="com.liferay.faces.alloy.component.inputtext.InputTextBase"
 		rendererParentClass="com.liferay.faces.alloy.render.internal.DelegatingAlloyRendererBase" yui="true"
 		module="autocomplete">
 		<description>
@@ -922,15 +904,6 @@
 				<yuiName>resultHighlighter</yuiName>
 			</attribute>
 			<attribute>
-				<description>
-					<![CDATA[A method that is executed when an autoComplete item is selected. The method must be <code>public</code>, return <code>void</code>, and take an <code>com.liferay.faces.alloy.component.autocomplete.ItemSelectEvent</code> argument.]]>
-				</description>
-				<name>itemSelectListener</name>
-				<method-signature>
-					void itemSelectListener(com.liferay.faces.alloy.component.autocomplete.ItemSelectEvent)
-				</method-signature>
-			</attribute>
-			<attribute>
 				<defaultValue>false</defaultValue>
 				<description>
 					<![CDATA[When true, the component will perform server-side validation to ensure that the value entered is on the list of completion items. Default is <code>false</code>.]]>
@@ -1029,7 +1002,7 @@
 		</attributes>
 	</component>
 	<component name="ButtonRow" delegateRendererType="javax.faces.Group" extendsTags="HTMLCommonEvents"
-		parentClass="javax.faces.component.html.HtmlPanelGroup"
+		extraStyleClasses="button-holder" parentClass="javax.faces.component.html.HtmlPanelGroup"
 		rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
 		<description>
 			<![CDATA[ButtonRow is a UIPanel component that renders a <code>&lt;div&gt;</code> element for grouping purposes. Since it extends HtmlPanelGroup, it supports all the features of h:panelGroup.]]>
@@ -1139,7 +1112,7 @@
 		</attributes>
 	</component>
 	<component name="CommandButton" delegateRendererType="javax.faces.Button"
-		extendsTags="AutoAjaxCommandCommon ButtonCommon FacesMessageLabelInherited UICommand"
+		extendsTags="AutoAjaxCommandCommon ButtonCommon UICommand"
 		parentClass="javax.faces.component.html.HtmlCommandButton"
 		rendererParentClass="com.liferay.faces.alloy.component.button.internal.AbstractButtonRenderer">
 		<description>
@@ -1155,6 +1128,7 @@
 			</attribute>
 			<!-- h:commandButton attributes -->
 			<attribute>
+				<defaultToComponentLabel>false</defaultToComponentLabel>
 				<description>
 					<![CDATA[A name for this component to be rendered to the user. This name should be localized for the user.]]>
 				</description>
@@ -1218,7 +1192,7 @@
 		</attributes>
 	</component>
 	<component name="DataTable" extendsTags="ClientComponent UIData HTMLCommonEvents HTMLPassthrough HTMLTable"
-		handlerClass="com.liferay.faces.alloy.component.datatable.internal.DataTableHandler"
+		extraStyleClasses="table table-bordered table-hover table-striped"
 		module="aui-datatable" parentClass="javax.faces.component.html.HtmlDataTable"
 		rendererParentClass="com.liferay.faces.alloy.render.internal.AlloyRendererBase" yui="true">
 		<description>
@@ -1240,42 +1214,6 @@
 				</description>
 				<name>multiColumnSort</name>
 				<type>boolean</type>
-			</attribute>
-			<attribute>
-				<description>
-					<![CDATA[A method that is executed when a row is deselected. The method must be <code>public</code>, return <code>void</code>, and take an <code>RowDeselectEvent</code> argument.]]>
-				</description>
-				<name>rowDeselectListener</name>
-				<method-signature>
-					void rowDeselectListener(com.liferay.faces.alloy.component.datatable.RowDeselectEvent)
-				</method-signature>
-			</attribute>
-			<attribute>
-				<description>
-					<![CDATA[A method that is executed when a range of rows is deselected. The method must be <code>public</code>, return <code>void</code>, and take an <code>RowDeselectRangeEvent</code> argument.]]>
-				</description>
-				<name>rowDeselectRangeListener</name>
-				<method-signature>
-					void rowDeselectRangeListener(com.liferay.faces.alloy.component.datatable.RowDeselectRangeEvent)
-				</method-signature>
-			</attribute>
-			<attribute>
-				<description>
-					<![CDATA[A method that is executed when a row is selected. The method must be <code>public</code>, return <code>void</code>, and take an <code>RowSelectEvent</code> argument.]]>
-				</description>
-				<name>rowSelectListener</name>
-				<method-signature>
-					void rowSelectListener(com.liferay.faces.alloy.component.datatable.RowSelectEvent)
-				</method-signature>
-			</attribute>
-			<attribute>
-				<description>
-					<![CDATA[A method that is executed when a range of rows is selected. The method must be <code>public</code>, return <code>void</code>, and take an <code>RowSelectRangeEvent</code> argument.]]>
-				</description>
-				<name>rowSelectRangeListener</name>
-				<method-signature>
-					void rowSelectRangeListener(com.liferay.faces.alloy.component.datatable.RowSelectRangeEvent)
-				</method-signature>
 			</attribute>
 			<attribute>
 				<description>
@@ -1336,6 +1274,7 @@
 		</description>
 		<attributes>
 			<attribute>
+				<defaultToComponentLabel>false</defaultToComponentLabel>
 				<description>
 					<![CDATA[The text value for the rendered &lt;label&gt; element.]]>
 				</description>
@@ -1360,7 +1299,9 @@
 			</attribute>
 		</attributes>
 	</component>
-	<component name="Fieldset" extendsTags="KeyboardDOMEvents MouseDOMEvents Styleable UIComponentBase" parentClass="javax.faces.component.UIPanel">
+	<component name="Fieldset" extendsTags="KeyboardDOMEvents MouseDOMEvents Styleable UIComponentBase"
+		extraStyleClasses="fieldset" parentClass="javax.faces.component.UIPanel"
+		rendererParentClass="com.liferay.faces.alloy.render.internal.PassThroughRenderer">
 		<description>
 			<![CDATA[Fieldset is a UIPanel component that renders a &lt;fieldset&gt; element in order to group form elements.]]>
 		</description>
@@ -1592,15 +1533,6 @@
 			</attribute>
 			<attribute>
 				<description>
-					<![CDATA[A method that is executed when an date is clicked. The method must be <code>public</code>, return <code>void</code>, and take an <code>com.liferay.faces.alloy.component.inputdate.InputDateEvent</code> argument.]]>
-				</description>
-				<name>dateSelectListener</name>
-				<method-signature>
-					void dateSelectListener(com.liferay.faces.alloy.component.inputdate.DateSelectEvent)
-				</method-signature>
-			</attribute>
-			<attribute>
-				<description>
 					<![CDATA[The maximum date that can be selected by the user. This attribute can be of type <code>java.lang.String</code> or <code>java.util.Date</code>.]]>
 				</description>
 				<name>maxDate</name>
@@ -1624,7 +1556,7 @@
 		</attributes>
 	</component>
 	<component name="InputDateTime" extendsTags="InputDateTimeCommon"
-		generateTaglibXML="false" parentClass="com.liferay.faces.alloy.component.inputtext.AbstractInputText"
+		generateTaglibXML="false" parentClass="com.liferay.faces.alloy.component.inputtext.InputTextBase"
 		rendererParentClass="com.liferay.faces.alloy.render.internal.DelegatingAlloyRendererBase">
 		<attributes>
 			<attribute>
@@ -1672,8 +1604,8 @@
 		</attributes>
 	</component>
 	<component name="InputFile" delegateRendererType="javax.faces.File" extendsTags="ClientComponent InputText"
-		handlerClass="com.liferay.faces.alloy.component.inputfile.internal.InputFileHandler" module="uploader"
-		parentClass="javax.faces.component.html.HtmlInputFile"
+		extraStyleClasses="field" handlerClass="com.liferay.faces.alloy.component.inputfile.internal.InputFileHandler"
+		module="uploader" parentClass="javax.faces.component.html.HtmlInputFile"
 		rendererParentClass="com.liferay.faces.alloy.component.inputfile.internal.InputFileRendererCompat"
 		yui="true" yuiName="Uploader">
 		<description>
@@ -1699,6 +1631,13 @@
 			</attribute>
 			<attribute>
 				<description>
+					<![CDATA[Comma-delimited list of uploaded file MIME types that are valid. If not specified, then all MIME types are assumed to be valid.]]>
+				</description>
+				<name>contentTypes</name>
+				<type>java.lang.String</type>
+			</attribute>
+			<attribute>
+				<description>
 					<![CDATA[A method that is executed when a file is uploaded. The method must be <code>public</code>, return <code>void</code>, and take a <code>FileUploadEvent</code> argument.]]>
 				</description>
 				<name>fileUploadListener</name>
@@ -1712,6 +1651,13 @@
 				</description>
 				<type>java.lang.String</type>
 				<name>location</name>
+			</attribute>
+			<attribute>
+				<description>
+					<![CDATA[Maximum length (in bytes) permitted for each individual uploaded file. If not specified, then files of any length are assumed to be valid.]]>
+				</description>
+				<name>maxFileSize</name>
+				<type>java.lang.Long</type>
 			</attribute>
 			<attribute>
 				<description>
@@ -1745,7 +1691,7 @@
 			<![CDATA[InputHidden is a UIInput component that renders an input element with type="hidden". Since it extends HtmlInputHidden, it supports all the features of h:inputHidden.]]>
 		</description>
 	</component>
-	<component name="InputSecret" delegateRendererType="javax.faces.Secret"
+	<component name="InputSecret" delegateRendererType="javax.faces.Secret" extraStyleClasses="field"
 		extendsTags="AltInherited AutocompleteInherited DisabledInherited FacesMessageLabelInherited InputCommon SizeInherited"
 		parentClass="javax.faces.component.html.HtmlInputSecret"
 		rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
@@ -1766,7 +1712,7 @@
 		</attributes>
 	</component>
 	<component name="InputSourceCode" delegateRendererType="javax.faces.Text"
-		extendsTags="ClientComponent StyleableInherited UIInput" module="aui-ace-editor"
+		extendsTags="ClientComponent FacesMessageLabelInherited StyleableInherited UIInput" module="aui-ace-editor"
 		parentClass="javax.faces.component.html.HtmlInputText"
 		rendererParentClass="com.liferay.faces.alloy.render.internal.DelegatingAlloyRendererBase" yui="true"
 		yuiName="AceEditor">
@@ -1882,7 +1828,7 @@
 			</attribute>
 		</attributes>
 	</component>
-	<component name="InputText" delegateRendererType="javax.faces.Text"
+	<component name="InputText" delegateRendererType="javax.faces.Text" extraStyleClasses="field"
 		extendsTags="AltInherited AutocompleteInherited DisabledInherited FacesMessageLabelInherited InputCommon SizeInherited"
 		parentClass="javax.faces.component.html.HtmlInputText"
 		rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
@@ -1891,7 +1837,7 @@
 		</description>
 	</component>
 	<component name="InputTextarea" delegateRendererType="javax.faces.Textarea"
-		extendsTags="FacesMessageLabelInherited DisabledInherited InputCommon"
+		extendsTags="FacesMessageLabelInherited DisabledInherited InputCommon" extraStyleClasses="field"
 		parentClass="javax.faces.component.html.HtmlInputTextarea"
 		rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
 		<description>
@@ -1983,15 +1929,6 @@
 				<type>java.lang.String</type>
 			</attribute>
 			<attribute>
-				<description>
-					<![CDATA[A method that is executed when an date is clicked. The method must be <code>public</code>, return <code>void</code>, and take an <code>com.liferay.faces.alloy.component.inputtime.TimeSelectEvent</code> argument.]]>
-				</description>
-				<name>timeSelectListener</name>
-				<method-signature>
-					void timeSelectListener(com.liferay.faces.alloy.component.inputtime.TimeSelectEvent)
-				</method-signature>
-			</attribute>
-			<attribute>
 				<description><![CDATA[The maximum amount of autoComplete results.]]></description>
 				<name>maxResults</name>
 				<type>java.lang.Integer</type>
@@ -2022,7 +1959,7 @@
 				<description>
 					<![CDATA[When true, the component will render an HTML5 <code>&lt;input type="time" /&gt;</code> element on small/mobile displays in order to enable selection of a time with the mobile device's native UI. The default is true.]]>
 				</description>
-				<name>responsive</name>
+				<name>nativeWhenMobile</name>
 				<type>boolean</type>
 			</attribute>
 			<attribute>
@@ -2058,7 +1995,8 @@
 			<![CDATA[Link is a UIOutcomeTarget component that renders an <code>&lt;a&gt;</code> element (hyperlink). Since it extends HtmlLink, it supports all the features of h:link.]]>
 		</description>
 	</component>
-	<component name="Media" extendsTags="KeyboardDOMEvents MouseDOMEvents Styleable ResourceCommon" generateTaglibXML="false">
+	<component name="Media" extendsTags="KeyboardDOMEvents MouseDOMEvents Styleable ResourceCommon" generateTaglibXML="false"
+		rendererParentClass="com.liferay.faces.alloy.render.internal.PassThroughRenderer">
 		<attributes>
 			<attribute>
 				<defaultValue>false</defaultValue>
@@ -2344,6 +2282,7 @@
 		</description>
 		<attributes>
 			<attribute>
+				<defaultToComponentLabel>false</defaultToComponentLabel>
 				<description>
 					<![CDATA[The visible label for the menu. This is only used if a facet with name="label" is not present.]]>
 				</description>
@@ -2353,7 +2292,7 @@
 		</attributes>
 	</component>
 	<component name="Message" delegateRendererType="javax.faces.Message" extendsTags="MessageCommon"
-		parentClass="javax.faces.component.html.HtmlMessage"
+		extraStyleClasses="help-inline" parentClass="javax.faces.component.html.HtmlMessage"
 		rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
 		<description>
 			<![CDATA[Message is a UIMessage component that renders a <code>&lt;span&gt;</code> element containing the text of a single FacesMessage for an associated component. Since it extends HtmlMessage, it supports all the features of h:message.]]>
@@ -2720,7 +2659,8 @@
 			</attribute>
 		</attributes>
 	</component>
-	<component name="Panel" extendsTags="PanelGroup" parentClass="com.liferay.faces.alloy.component.panelgroup.PanelGroupBlockLayout"
+	<component name="Panel" extendsTags="PanelGroup" extraStyleClasses="alloy-panel-default"
+		parentClass="com.liferay.faces.alloy.component.panelgroup.PanelGroupBlockLayout"
 		rendererParentClass="com.liferay.faces.alloy.component.panelgroup.internal.PanelGroupRendererBase">
 		<description>
 			<![CDATA[Panel is a UIPanel component that renders a <code>&lt;div&gt;</code> element with three child <code>&lt;div&gt;</code> elements (one for header, body, and footer). Since it extends HtmlPanelGroup, it supports all the features of h:panelGroup.]]>
@@ -2785,8 +2725,7 @@
 			</attribute>
 		</attributes>
 	</component>
-	<component name="ProgressBar" extendsTags="ClientComponent Styleable UIComponentBase"
-		handlerClass="com.liferay.faces.alloy.component.progressbar.internal.ProgressBarHandler" module="aui-progressbar"
+	<component name="ProgressBar" extendsTags="ClientComponent Styleable UIComponentBase" module="aui-progressbar"
 		parentClass="javax.faces.component.UIComponentBase"
 		rendererParentClass="com.liferay.faces.alloy.render.internal.AlloyRendererBase" yui="true">
 		<description>
@@ -2801,16 +2740,6 @@
 		<attributes>
 			<attribute>
 				<description>
-					<![CDATA[A method that is executed when an progress has completed. The method must be <code>public</code>, return <code>void</code>, and take an <code>com.liferay.faces.alloy.component.progressbar.ProgressCompleteEvent</code> argument.]]>
-				</description>
-				<name>progressCompleteListener</name>
-				<method-signature>
-					void progressCompleteListener(com.liferay.faces.alloy.component.progressbar.ProgressCompleteEvent)
-				</method-signature>
-				<type>javax.el.MethodExpression</type>
-			</attribute>
-			<attribute>
-				<description>
 					<![CDATA[The the height (in pixels) of the progress bar.]]>
 				</description>
 				<name>height</name>
@@ -2818,6 +2747,7 @@
 				<yui>true</yui>
 			</attribute>
 			<attribute>
+				<defaultToComponentLabel>false</defaultToComponentLabel>
 				<description>
 					<![CDATA[The label which appears on the progress bar. The <code>{0}</code> token can be used to include the value in the label.]]>
 				</description>
@@ -2925,16 +2855,18 @@
 	</component>
 	<component name="SelectBooleanCheckbox" delegateRendererType="javax.faces.Checkbox"
 		extendsTags="DisabledInherited FacesMessageLabelInherited HTMLAccessibilityEvents HTMLInputEvents"
-		parentClass="javax.faces.component.html.HtmlSelectBooleanCheckbox" rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
+		extraStyleClasses="checkbox" parentClass="javax.faces.component.html.HtmlSelectBooleanCheckbox"
+		rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
 		<description>
 			<![CDATA[SelectBooleanCheckbox is a UISelectOne component that renders a check box. Since it extends HtmlSelectBooleanCheckbox, it supports all the features of h:selectBooleanCheckbox such as accepting f:selectItem or f:selectItems as child tags.]]>
 		</description>
 	</component>
 	<component name="SelectManyCheckbox" delegateRendererType="javax.faces.Checkbox"
 		extendsTags="UISelectMany DisabledInherited FacesMessageLabelInherited HTMLAccessibilityEvents HTMLInputEvents"
-		parentClass="javax.faces.component.html.HtmlSelectManyCheckbox" rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
+		extraStyleClasses="checkbox" parentClass="javax.faces.component.html.HtmlSelectManyCheckbox"
+		rendererParentClass="com.liferay.faces.alloy.component.select.internal.SelectDelegatingRendererBase">
 		<description>
-			<![CDATA[SelectManyCheckbox is a UISelectMany component that renders checkboxes and enables the user to select multiple values. Since it extends HtmlSelectManyCheckbox, it supports all the features of h:selectManyCheckbox such as accepting f:selectItem or f:selectItems as child tags.]]>
+			<![CDATA[SelectManyCheckbox is a UISelectMany component that renders checkboxes and enables the user to select multiple values. Since it extends HtmlSelectManyCheckbox, it supports all the features of h:selectManyCheckbox such as accepting f:selectItem or f:selectItems as child tags. However, since it does not render a &lt;table&gt;, it does not support h:selectManyCheckbox's <code>border</code> and <code>layout</code> attributes.]]>
 		</description>
 		<attributes>
 			<attribute>
@@ -3005,19 +2937,18 @@
 	</component>
 	<component name="SelectOneRadio" delegateRendererType="javax.faces.Radio"
 		extendsTags="UISelect DisabledInherited FacesMessageLabelInherited HTMLAccessibilityEvents HTMLInputEvents"
-		parentClass="javax.faces.component.html.HtmlSelectOneRadio" rendererParentClass="com.liferay.faces.util.render.DelegatingRendererBase">
+		extraStyleClasses="radio" parentClass="javax.faces.component.html.HtmlSelectOneRadio"
+		rendererParentClass="com.liferay.faces.alloy.component.select.internal.SelectDelegatingRendererBase">
 		<description>
-			<![CDATA[SelectOneRadio is a UISelectOne component that renders radio buttons. Since it extends <a href="http://docs.oracle.com/javaee/7/api/javax/faces/component/html/HtmlSelectOneRadio.html" target="_blank"><code>HtmlSelectOneRadio</code></a>, it supports all the features of h:selectOneRadio such as accepting f:selectItem or f:selectItems as child tags.]]>
+			<![CDATA[SelectOneRadio is a UISelectOne component that renders radio buttons. Since it extends <a href="http://docs.oracle.com/javaee/7/api/javax/faces/component/html/HtmlSelectOneRadio.html" target="_blank"><code>HtmlSelectOneRadio</code></a>, it supports all the features of h:selectOneRadio such as accepting f:selectItem or f:selectItems as child tags. However, since it does not render a &lt;table&gt;, it does not support h:selectOneRadio's <code>border</code> and <code>layout</code> attributes.]]>
 		</description>
 	</component>
-	<component name="SelectStarRating" delegateRendererType="javax.faces.Radio"
-		extendsTags="ClientComponent FacesMessageLabelInherited StyleableInherited UIComponentBase UIInput" module="aui-rating"
-		parentClass="com.liferay.faces.alloy.component.selectoneradio.SelectOneRadio"
+	<component name="SelectRating" delegateRendererType="javax.faces.Radio"
+		extendsTags="FacesMessageLabelInheritedGenerateJavaFalse UIComponentBase UIInput"
+		generateTaglibXML="false" module="aui-rating"
+		parentClass="com.liferay.faces.alloy.component.selectoneradio.SelectOneRadioBase"
 		rendererParentClass="com.liferay.faces.alloy.render.internal.DelegatingAlloyRendererBase"
 		yui="true" yuiName="Rating">
-		<description>
-			<![CDATA[StarRating is a UISelectOne component that renders a set of stars. The user can click on a star to select a rating and click on the same star a second time to de-select a rating. Since it extends <a href="http://docs.oracle.com/javaee/7/api/javax/faces/component/html/HtmlSelectOneRadio.html" target="_blank"><code>HtmlSelectOneRadio</code></a>, it accepts f:selectItem or f:selectItems as child tags.]]>
-		</description>
 		<attributes>
 			<attribute>
 				<description>
@@ -3061,14 +2992,24 @@
 			</attribute>
 		</attributes>
 	</component>
-	<component name="SelectThumbRating" extendsTags="SelectStarRating" generateJava="false" module="aui-rating"
-		parentClass="com.liferay.faces.alloy.component.selectstarrating.SelectStarRating" rendererParentClass="com.liferay.faces.alloy.component.selectstarrating.SelectStarRatingRenderer"
-		yui="true" yuiName="ThumbRating">
+	<component name="SelectStarRating"
+		extendsTags="ClientComponent FacesMessageLabelInheritedGenerateJavaFalse StyleableInherited SelectRating"
+		parentClass="com.liferay.faces.alloy.component.selectrating.SelectRating"
+		rendererParentClass="com.liferay.faces.alloy.component.selectrating.internal.SelectRatingRenderer">
+		<description>
+			<![CDATA[SelectStarRating is a UISelectOne component that renders a set of stars. The user can click on a star to select a rating and click on the same star a second time to de-select a rating. Since it extends <a href="http://docs.oracle.com/javaee/7/api/javax/faces/component/html/HtmlSelectOneRadio.html" target="_blank"><code>HtmlSelectOneRadio</code></a>, it accepts f:selectItem or f:selectItems as child tags.]]>
+		</description>
+	</component>
+	<component name="SelectThumbRating"
+		extendsTags="ClientComponent FacesMessageLabelInheritedGenerateJavaFalse StyleableInherited SelectRating"
+		parentClass="com.liferay.faces.alloy.component.selectrating.SelectRating"
+		rendererParentClass="com.liferay.faces.alloy.component.selectrating.internal.SelectRatingRenderer">
 		<description>
 			<![CDATA[SelectThumbRating is a UISelectOne component that renders a pair of thumb icons that a user can select to indicate their favor. The user can click on a thumb to select their favor and click on the same thumb a second time to de-select their favor. Since it extends <a href="http://docs.oracle.com/javaee/7/api/javax/faces/component/html/HtmlSelectOneRadio.html" target="_blank"><code>HtmlSelectOneRadio</code></a>, it accepts f:selectItem or f:selectItems as children.]]>
 		</description>
 	</component>
-	<component name="Tab" extendsTags="Styleable UIComponentBase" handlerClass="com.liferay.faces.alloy.component.tab.internal.TabHandler"
+	<component name="Tab" extendsTags="Styleable UIComponentBase"
+		handlerClass="com.liferay.faces.alloy.component.tab.internal.TabHandler"
 		parentClass="javax.faces.component.UIColumn">
 		<description>
 			<![CDATA[Tab is a panel component that renders nested/child tags as content within itself.]]>
@@ -3105,7 +3046,7 @@
 			</attribute>
 		</attributes>
 	</component>
-	<component name="TabView" extendsTags="ClientComponent UIData Styleable UIComponentBase" handlerClass="com.liferay.faces.alloy.component.tabview.internal.TabViewHandler"
+	<component name="TabView" extendsTags="ClientComponent UIData Styleable UIComponentBase"
 		module="aui-tabview" parentClass="javax.faces.component.UIData" yui="true">
 		<description>
 			<![CDATA[TabView is an iterator component that renders tabs either statically or dynamically.]]>
@@ -3137,41 +3078,11 @@
 			</attribute>
 			<attribute>
 				<description>
-					<![CDATA[A method that is executed when a tab is clicked. The method must be <code>public</code>, return <code>void</code>, and take an <code>TabSelectEvent</code> argument.]]>
-				</description>
-				<name>tabSelectListener</name>
-				<method-signature>
-					void tabSelectListener(com.liferay.faces.alloy.component.tab.TabSelectEvent)
-				</method-signature>
-			</attribute>
-			<attribute>
-				<description>
 					<![CDATA[The the height (in pixels) of the rendered <code>&lt;div&gt;</code>.]]>
 				</description>
 				<name>width</name>
 				<type>java.lang.String</type>
 				<yui>true</yui>
-			</attribute>
-		</attributes>
-	</component>
-	<component name="ValidateFile" generateJava="false" validatorId="com.liferay.faces.alloy.component.inputfile.InputFileValidator">
-		<description>
-			<![CDATA[Validator that is meant to be used in conjunction with the <code>alloy:inputFile</code> component.]]>
-		</description>
-		<attributes>
-			<attribute>
-				<description>
-					<![CDATA[Comma-delimited list of uploaded file MIME types that are valid. If not specified, then all MIME types are assumed to be valid.]]>
-				</description>
-				<name>contentTypes</name>
-				<type>java.lang.String</type>
-			</attribute>
-			<attribute>
-				<description>
-					<![CDATA[Maximum length (in bytes) permitted for each individual uploaded file. If not specified, then files of any length are assumed to be valid.]]>
-				</description>
-				<name>maxFileSize</name>
-				<type>java.lang.Long</type>
 			</attribute>
 		</attributes>
 	</component>

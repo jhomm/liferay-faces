@@ -10,7 +10,7 @@
 		<tag-name>inputFile</tag-name>
 		<component>
 			<component-type>com.liferay.faces.bridge.component.inputfile.InputFile</component-type>
-			<renderer-type>com.liferay.faces.bridge.component.inputfile.internal.InputFileRenderer</renderer-type>
+			<renderer-type>com.liferay.faces.bridge.component.inputfile.InputFileRenderer</renderer-type>
 			<handler-class>com.liferay.faces.bridge.component.inputfile.internal.InputFileHandler</handler-class>
 		</component>
 		<attribute>
@@ -279,7 +279,7 @@ java.lang.Object)</method-signature>
 			<method-signature>void valueChange(javax.faces.event.ValueChangeEvent)</method-signature>
 		</attribute>
 		<tag-extension>
-			<vdldoc:since>4.2.0</vdldoc:since>
+			<vdldoc:since>4.2.5-ga6</vdldoc:since>
 		</tag-extension>
 	</tag>
 </facelet-taglib>

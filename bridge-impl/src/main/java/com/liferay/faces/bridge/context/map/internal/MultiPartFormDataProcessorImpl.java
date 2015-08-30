@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ClientDataRequest;
@@ -57,8 +58,6 @@ import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.model.UploadedFile;
 import com.liferay.faces.util.model.UploadedFileFactory;
 
-import com.liferay.portal.kernel.util.StringPool;
-
 
 /**
  * @author  Neil Griffin
@@ -83,7 +82,7 @@ public class MultiPartFormDataProcessorImpl implements MultiPartFormDataProcesso
 
 		// FACES-1452: Non-alpha-numeric characters must be removed order to ensure that the folder will be
 		// created properly.
-		sessionId = sessionId.replaceAll("[^A-Za-z0-9]", StringPool.BLANK);
+		sessionId = sessionId.replaceAll("[^A-Za-z0-9]", "");
 
 		File uploadedFilesPath = new File(uploadedFilesDir, sessionId);
 
@@ -216,8 +215,12 @@ public class MultiPartFormDataProcessorImpl implements MultiPartFormDataProcesso
 								File copiedFile = new File(copiedFileAbsolutePath);
 								FileUtils.copyFile(tempFile, copiedFile);
 
-								// If present, build up a map of headers.
-								Map<String, List<String>> headersMap = new HashMap<String, List<String>>();
+								// If present, build up a map of headers. According to Hypertext Transfer Protocol --
+								// HTTP/1.1 (http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2), header names
+								// are case-insensitive. In order to support this, use a TreeMap with case insensitive
+								// keys.
+								Map<String, List<String>> headersMap = new TreeMap<String, List<String>>(
+										String.CASE_INSENSITIVE_ORDER);
 								FileItemHeaders fileItemHeaders = fieldStream.getHeaders();
 
 								if (fileItemHeaders != null) {
@@ -312,12 +315,11 @@ public class MultiPartFormDataProcessorImpl implements MultiPartFormDataProcesso
 
 		if (fileName != null) {
 
-			int pos = fileName.lastIndexOf(StringPool.PERIOD);
-			strippedFileName = fileName.replaceAll("[\\\\/\\[\\]:|<>+;=.?\"]", StringPool.DASH);
+			int pos = fileName.lastIndexOf(".");
+			strippedFileName = fileName.replaceAll("[\\\\/\\[\\]:|<>+;=.?\"]", "-");
 
 			if (pos > 0) {
-				strippedFileName = strippedFileName.substring(0, pos) + StringPool.PERIOD +
-					strippedFileName.substring(pos + 1);
+				strippedFileName = strippedFileName.substring(0, pos) + "." + strippedFileName.substring(pos + 1);
 			}
 		}
 

@@ -13,10 +13,10 @@
  */
 package com.liferay.faces.util.xml;
 
-import com.liferay.faces.util.xml.internal.SAXParserImpl;
 import java.net.URL;
 
 import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,9 +26,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
+import com.liferay.faces.util.xml.internal.SAXParserImpl;
 
 
 /**
@@ -43,7 +43,7 @@ public class SAXParserTest {
 	public void testFaceletComposition() {
 
 		try {
-			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+			SAXParserFactory saxParserFactory = ConcurrentSAXParserFactory.newInstance();
 
 			if (saxParserFactory != null) {
 				SAXParser saxParser = saxParserFactory.newSAXParser();
@@ -169,11 +169,11 @@ public class SAXParserTest {
 
 			if (localName.equals("selectOneMenu")) {
 				Assert.assertEquals(attributes.getLength(), 3);
-				Assert.assertEquals(StringPool.ID, attributes.getLocalName(0));
+				Assert.assertEquals("id", attributes.getLocalName(0));
 				Assert.assertEquals("provinceId", attributes.getValue(0));
 				Assert.assertEquals("required", attributes.getLocalName(1));
 				Assert.assertEquals("true", attributes.getValue(1));
-				Assert.assertEquals(StringPool.VALUE, attributes.getLocalName(2));
+				Assert.assertEquals("value", attributes.getLocalName(2));
 				Assert.assertEquals("#{applicantModelBean.provinceId}", attributes.getValue(2));
 			}
 
@@ -215,7 +215,7 @@ public class SAXParserTest {
 				Assert.assertEquals(uri, "http://liferay.com/faces/bridge");
 			}
 			else if (localName.equals("hr")) {
-				Assert.assertEquals(uri, StringPool.BLANK);
+				Assert.assertEquals(uri, "");
 			}
 		}
 

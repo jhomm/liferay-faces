@@ -29,7 +29,7 @@ public abstract class TabViewBase extends UIData implements Styleable, ClientCom
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.tabview.TabView";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.tabview.internal.TabViewRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.tabview.TabViewRenderer";
 
 	// Protected Enumerations
 	protected enum TabViewPropertyKeys {
@@ -39,7 +39,6 @@ public abstract class TabViewBase extends UIData implements Styleable, ClientCom
 		stacked,
 		style,
 		styleClass,
-		tabSelectListener,
 		width
 	}
 
@@ -104,14 +103,6 @@ public abstract class TabViewBase extends UIData implements Styleable, ClientCom
 	@Override
 	public void setStyleClass(String styleClass) {
 		getStateHelper().put(TabViewPropertyKeys.styleClass, styleClass);
-	}
-
-	public javax.el.MethodExpression getTabSelectListener() {
-		return (javax.el.MethodExpression) getStateHelper().eval(TabViewPropertyKeys.tabSelectListener, null);
-	}
-
-	public void setTabSelectListener(javax.el.MethodExpression tabSelectListener) {
-		getStateHelper().put(TabViewPropertyKeys.tabSelectListener, tabSelectListener);
 	}
 
 	public String getWidth() {

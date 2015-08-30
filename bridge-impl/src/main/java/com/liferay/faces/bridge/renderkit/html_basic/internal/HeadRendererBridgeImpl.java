@@ -33,13 +33,11 @@ import com.liferay.faces.bridge.context.BridgeContext;
 import com.liferay.faces.bridge.context.BridgePortalContext;
 import com.liferay.faces.bridge.context.HeadResponseWriter;
 import com.liferay.faces.bridge.context.HeadResponseWriterFactory;
-import com.liferay.faces.bridge.internal.BridgeConstants;
 import com.liferay.faces.bridge.renderkit.bridge.internal.BridgeRenderer;
 import com.liferay.faces.util.application.ComponentResource;
 import com.liferay.faces.util.application.ComponentResourceFactory;
 import com.liferay.faces.util.application.ComponentResourceUtil;
 import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -86,13 +84,12 @@ public class HeadRendererBridgeImpl extends BridgeRenderer {
 		}
 
 		// Sort the components that are in the view root into stylesheets and scripts.
-		List<UIComponent> uiViewRootComponentResources = uiViewRoot.getComponentResources(facesContext,
-				StringPool.HEAD);
+		List<UIComponent> uiViewRootComponentResources = uiViewRoot.getComponentResources(facesContext, "head");
 		List<UIComponent> uiViewRootStyleSheetResources = null;
 		List<UIComponent> uiViewRootScriptResources = null;
 
 		for (UIComponent curComponent : uiViewRootComponentResources) {
-			String resourceName = (String) curComponent.getAttributes().get(StringPool.NAME);
+			String resourceName = (String) curComponent.getAttributes().get("name");
 
 			if ((resourceName != null) && resourceName.endsWith(EXTENSION_CSS)) {
 
@@ -152,7 +149,7 @@ public class HeadRendererBridgeImpl extends BridgeRenderer {
 
 		// Determine whether or not this might be a Liferay runtime portlet (which does not have the ability to add
 		// script resources to the head).
-		Boolean renderPortletResource = (Boolean) portletRequest.getAttribute(BridgeConstants.RENDER_PORTLET_RESOURCE);
+		Boolean renderPortletResource = (Boolean) portletRequest.getAttribute("RENDER_PORTLET_RESOURCE");
 		boolean liferayRuntimePortlet = (renderPortletResource != null) && renderPortletResource.booleanValue();
 
 		// Note: The HeadManagedBean is a ViewScoped manage-bean that keeps a list of resources that have been added to
@@ -307,9 +304,9 @@ public class HeadRendererBridgeImpl extends BridgeRenderer {
 		// in order to prevent events from firing during the relocation process.
 		for (UIComponent uiComponentResource : resourcesForRelocatingToBody) {
 
-			uiComponentResource.getAttributes().put(ORIGINAL_TARGET, StringPool.HEAD);
+			uiComponentResource.getAttributes().put(ORIGINAL_TARGET, "head");
 			uiComponentResource.getAttributes().put(ADDED, Boolean.TRUE);
-			uiViewRoot.addComponentResource(facesContext, uiComponentResource, StringPool.BODY);
+			uiViewRoot.addComponentResource(facesContext, uiComponentResource, "body");
 
 			if (logger.isDebugEnabled()) {
 				ComponentResource componentResource = componentResourceFactory.getComponentResource(

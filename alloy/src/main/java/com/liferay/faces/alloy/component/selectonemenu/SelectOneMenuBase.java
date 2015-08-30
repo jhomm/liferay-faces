@@ -28,7 +28,7 @@ public abstract class SelectOneMenuBase extends HtmlSelectOneMenu implements Sty
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.selectonemenu.SelectOneMenu";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectonemenu.internal.SelectOneMenuRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.selectonemenu.SelectOneMenuRenderer";
 
 	// Protected Enumerations
 	protected enum SelectOneMenuPropertyKeys {
@@ -38,6 +38,23 @@ public abstract class SelectOneMenuBase extends HtmlSelectOneMenu implements Sty
 	public SelectOneMenuBase() {
 		super();
 		setRendererType(RENDERER_TYPE);
+	}
+
+	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
 	}
 
 	@Override

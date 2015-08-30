@@ -28,7 +28,7 @@ public abstract class InputTextBase extends HtmlInputText implements Styleable {
 
 	// Public Constants
 	public static final String COMPONENT_TYPE = "com.liferay.faces.alloy.component.inputtext.InputText";
-	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputtext.internal.InputTextRenderer";
+	public static final String RENDERER_TYPE = "com.liferay.faces.alloy.component.inputtext.InputTextRenderer";
 
 	// Protected Enumerations
 	protected enum InputTextPropertyKeys {
@@ -41,12 +41,29 @@ public abstract class InputTextBase extends HtmlInputText implements Styleable {
 	}
 
 	@Override
+	public String getLabel() {
+
+		String label = super.getLabel();
+
+		if (label == null) {
+
+			javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+
+			if (facesContext.getCurrentPhaseId() == javax.faces.event.PhaseId.PROCESS_VALIDATIONS) {
+				label = com.liferay.faces.util.component.ComponentUtil.getComponentLabel(this);
+			}
+		}
+
+		return label;
+	}
+
+	@Override
 	public String getStyleClass() {
 		// getStateHelper().eval(InputTextPropertyKeys.styleClass, null) is called because super.getStyleClass() may return the
 		// STYLE_CLASS_NAME of the super class.
 		String styleClass = (String) getStateHelper().eval(InputTextPropertyKeys.styleClass, null);
 
-		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-input-text");
+		return com.liferay.faces.util.component.ComponentUtil.concatCssClasses(styleClass, "alloy-input-text", "field");
 	}
 
 	@Override

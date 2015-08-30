@@ -43,11 +43,8 @@ import com.liferay.faces.bridge.context.internal.ExternalContextImpl;
 import com.liferay.faces.bridge.context.url.BridgeURI;
 import com.liferay.faces.bridge.context.url.BridgeURL;
 import com.liferay.faces.bridge.helper.internal.WindowStateHelper;
-import com.liferay.faces.bridge.internal.BridgeConstants;
 import com.liferay.faces.bridge.util.internal.RequestParameter;
-import com.liferay.faces.util.application.ResourceConstants;
 import com.liferay.faces.util.helper.BooleanHelper;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -147,7 +144,7 @@ public abstract class BridgeURLBase implements BridgeURL {
 
 		String uri = bridgeURI.toString();
 
-		int endPos = uri.indexOf(StringPool.QUESTION);
+		int endPos = uri.indexOf("?");
 
 		if (endPos < 0) {
 			endPos = uri.length();
@@ -172,7 +169,7 @@ public abstract class BridgeURLBase implements BridgeURL {
 
 		boolean firstParam = true;
 
-		buf.append(StringPool.QUESTION);
+		buf.append("?");
 
 		Set<String> parameterNames = getParameterMap().keySet();
 		boolean foundFacesViewIdParam = false;
@@ -217,11 +214,11 @@ public abstract class BridgeURLBase implements BridgeURL {
 					firstParam = false;
 				}
 				else {
-					buf.append(StringPool.AMPERSAND);
+					buf.append("&");
 				}
 
 				buf.append(parameterName);
-				buf.append(StringPool.EQUAL);
+				buf.append("=");
 				buf.append(parameterValue);
 			}
 		}
@@ -237,11 +234,11 @@ public abstract class BridgeURLBase implements BridgeURL {
 				if (!modeChanged) {
 
 					if (!firstParam) {
-						buf.append(StringPool.AMPERSAND);
+						buf.append("&");
 					}
 
 					buf.append(getViewIdParameterName());
-					buf.append(StringPool.EQUAL);
+					buf.append("=");
 
 					String contextPath = bridgeContext.getPortletRequest().getContextPath();
 					String contextRelativePath = bridgeURI.getContextRelativePath(contextPath);
@@ -330,7 +327,7 @@ public abstract class BridgeURLBase implements BridgeURL {
 			ResourceURL resourceURL = mimeResponse.createResourceURL();
 
 			// If the "javax.faces.resource" token is found in the URL, then
-			int tokenPos = fromURL.indexOf(ResourceConstants.JAVAX_FACES_RESOURCE);
+			int tokenPos = fromURL.indexOf("javax.faces.resource");
 
 			if (tokenPos >= 0) {
 
@@ -352,13 +349,13 @@ public abstract class BridgeURLBase implements BridgeURL {
 					resourceName = resourceName.substring(slashPos + 1);
 				}
 				else {
-					logger.error("There is no slash after the [{0}] token in resourceURL=[{1}]",
-						ResourceConstants.JAVAX_FACES_RESOURCE, fromURL);
+					logger.error("There is no slash after the [{0}] token in resourceURL=[{1}]", "javax.faces.resource",
+						fromURL);
 				}
 
-				resourceURL.setParameter(ResourceConstants.JAVAX_FACES_RESOURCE, resourceName);
-				logger.debug("Added parameter to portletURL name=[{0}] value=[{1}]",
-					ResourceConstants.JAVAX_FACES_RESOURCE, resourceName);
+				resourceURL.setParameter("javax.faces.resource", resourceName);
+				logger.debug("Added parameter to portletURL name=[{0}] value=[{1}]", "javax.faces.resource",
+					resourceName);
 			}
 
 			// Copy the request parameters to the portlet resource URL.
@@ -385,14 +382,14 @@ public abstract class BridgeURLBase implements BridgeURL {
 		boolean match = false;
 
 		String path1 = null;
-		int lastSlashPos = file1.lastIndexOf(StringPool.FORWARD_SLASH);
+		int lastSlashPos = file1.lastIndexOf("/");
 
 		if (lastSlashPos > 0) {
 			path1 = file1.substring(0, lastSlashPos);
 		}
 
 		String path2 = null;
-		lastSlashPos = file2.lastIndexOf(StringPool.FORWARD_SLASH);
+		lastSlashPos = file2.lastIndexOf("/");
 
 		if (lastSlashPos > 0) {
 			path2 = file2.substring(0, lastSlashPos);
@@ -401,14 +398,14 @@ public abstract class BridgeURLBase implements BridgeURL {
 		if (((path1 == null) && (path2 == null)) || ((path1 != null) && (path2 != null) && path1.equals(path2))) {
 
 			String ext1 = null;
-			int lastDotPos = file1.indexOf(StringPool.PERIOD);
+			int lastDotPos = file1.indexOf(".");
 
 			if (lastDotPos > 0) {
 				ext1 = file1.substring(lastDotPos);
 			}
 
 			String ext2 = null;
-			lastDotPos = file2.indexOf(StringPool.PERIOD);
+			lastDotPos = file2.indexOf(".");
 
 			if (lastDotPos > 0) {
 				ext2 = file2.substring(lastDotPos);
@@ -444,18 +441,40 @@ public abstract class BridgeURLBase implements BridgeURL {
 				if (queryString.length() > 0) {
 					requestParameters = new ArrayList<RequestParameter>();
 
-					String[] queryParameters = queryString.split(BridgeConstants.REGEX_AMPERSAND_DELIMITER);
+					String[] queryParameters = queryString.split("[&]");
 
 					for (String queryParameter : queryParameters) {
+
 						String[] nameValueArray = queryParameter.split("[=]");
 
-						if (nameValueArray.length == 2) {
-							String name = nameValueArray[0];
-							String value = nameValueArray[1];
-							requestParameters.add(new RequestParameter(name, value));
+						if (nameValueArray.length == 1) {
+
+							String name = nameValueArray[0].trim();
+
+							if (name.length() == 0) {
+								throw new MalformedURLException("Invalid name/value pair=[" + queryParameter +
+									"]: name cannot be empty.");
+							}
+							else {
+								requestParameters.add(new RequestParameter(name, ""));
+							}
+						}
+						else if (nameValueArray.length == 2) {
+
+							String name = nameValueArray[0].trim();
+
+							if (name.length() == 0) {
+								throw new MalformedURLException("Invalid name/value pair=[" + queryParameter +
+									"]: name cannot be empty.");
+							}
+							else {
+
+								String value = nameValueArray[1];
+								requestParameters.add(new RequestParameter(name, value));
+							}
 						}
 						else {
-							throw new MalformedURLException("invalid name/value pair: " + queryParameter);
+							throw new MalformedURLException("Invalid name/value pair: " + queryParameter);
 						}
 					}
 				}

@@ -25,10 +25,7 @@ import javax.faces.render.RenderKit;
 import javax.faces.render.Renderer;
 import javax.servlet.jsp.tagext.Tag;
 
-import com.liferay.faces.util.client.ClientScript;
-import com.liferay.faces.util.client.ClientScriptFactory;
-import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.lang.StringPool;
+import com.liferay.faces.util.context.FacesRequestContext;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -62,7 +59,7 @@ public abstract class DelayedPortalTagRenderer<U extends UIComponent, T extends 
 		RenderKit renderKit = facesContext.getRenderKit();
 		StringWriter bufferedChildrenMarkupWriter = new StringWriter();
 		ResponseWriter stringResponseWriter = renderKit.createResponseWriter(bufferedChildrenMarkupWriter, null,
-				StringPool.UTF8);
+				"UTF-8");
 		facesContext.setResponseWriter(stringResponseWriter);
 
 		List<UIComponent> children = uiComponent.getChildren();
@@ -105,11 +102,15 @@ public abstract class DelayedPortalTagRenderer<U extends UIComponent, T extends 
 			// Ensure that scripts are rendered at the bottom of the page.
 			String scripts = portalTagOutput.getScripts();
 
-			if (scripts != null) {
-				ClientScriptFactory clientScriptFactory = (ClientScriptFactory) FactoryExtensionFinder.getFactory(
-						ClientScriptFactory.class);
-				ClientScript clientScript = clientScriptFactory.getClientScript();
-				clientScript.append(scripts);
+			if ((scripts != null) && (scripts.length() > 0)) {
+
+				logger.debug("Scripts before transformation:{0}", scripts);
+
+				String processedScripts = getScripts(uiComponent, scripts);
+				logger.debug("Scripts after transformation:{0}", processedScripts);
+
+				FacesRequestContext facesRequestContext = FacesRequestContext.getCurrentInstance();
+				facesRequestContext.addScript(processedScripts);
 			}
 
 			// Encode the children markup.
@@ -148,5 +149,9 @@ public abstract class DelayedPortalTagRenderer<U extends UIComponent, T extends 
 	@Override
 	public boolean getRendersChildren() {
 		return true;
+	}
+
+	protected String getScripts(UIComponent uiComponent, String scripts) throws Exception {
+		return scripts;
 	}
 }

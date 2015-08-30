@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components>
-<components defaultSince="4.2.0">
+<components defaultSince="4.2.5-ga6">
 	<!-- generateTaglibXML="false" tags for common attributes -->
 	<!-- 1. Interfaces -->
 	<component name="AltInherited" generateJava="false" generateTaglibXML="false">
@@ -401,6 +401,18 @@
 		</attributes>
 	</component>
 	<component name="FacesMessageLabelInherited" generateJava="false" generateTaglibXML="false">
+		<attributes>
+			<attribute>
+				<description>
+					<![CDATA[A localized label for this component that is typically only rendered in a FacesMessage when validation fails.]]>
+				</description>
+				<name>label</name>
+				<type>java.lang.String</type>
+				<inherited>true</inherited>
+			</attribute>
+		</attributes>
+	</component>
+	<component name="FacesMessageLabelInheritedGenerateJavaFalse" generateJava="false" generateTaglibXML="false">
 		<attributes>
 			<attribute>
 				<description>

@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.liferay.faces.bridge.internal.BridgeConstants;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -39,45 +37,52 @@ public class URLUtil {
 		Map<String, String[]> parameterMapValuesArray = new LinkedHashMap<String, String[]>();
 
 		if (url != null) {
-			int pos = url.indexOf(StringPool.QUESTION);
+			int pos = url.indexOf("?");
 
 			if (pos > 0) {
 				String queryString = url.substring(pos + 1);
-				queryString = queryString.replaceAll(StringPool.AMPERSAND_ENCODED, StringPool.AMPERSAND);
+				queryString = queryString.replaceAll("&amp;", "&");
 
 				if ((queryString != null) && (queryString.length() > 0)) {
 
-					pos = queryString.indexOf(StringPool.POUND);
+					pos = queryString.indexOf("#");
 
 					if (pos > 0) {
 						queryString = queryString.substring(0, pos);
 					}
 
-					String[] queryParameters = queryString.split(BridgeConstants.REGEX_AMPERSAND_DELIMITER);
+					String[] queryParameters = queryString.split("[&]");
 
 					for (String queryParameter : queryParameters) {
+
 						String[] nameValueArray = queryParameter.split("[=]");
 
-						if (nameValueArray != null) {
+						String name = nameValueArray[0].trim();
+						String[] existingValues = parameterMapValuesArray.get(name);
 
-							String name = nameValueArray[0];
-							String[] existingValues = parameterMapValuesArray.get(name);
+						if (nameValueArray.length == 1) {
 
-							if (nameValueArray.length == 1) {
-								String[] newValues = null;
+							String[] newValues;
 
-								if (existingValues == null) {
-									newValues = new String[] { StringPool.BLANK };
-								}
-								else {
-									newValues = Arrays.copyOf(existingValues, existingValues.length + 1);
-									newValues[existingValues.length] = StringPool.BLANK;
-								}
-
-								parameterMapValuesArray.put(name, newValues);
+							if (existingValues == null) {
+								newValues = new String[] { "" };
 							}
-							else if (nameValueArray.length == 2) {
-								String[] newValues = null;
+							else {
+								newValues = Arrays.copyOf(existingValues, existingValues.length + 1);
+								newValues[existingValues.length] = "";
+							}
+
+							parameterMapValuesArray.put(name, newValues);
+						}
+						else if (nameValueArray.length == 2) {
+
+							if (name.length() == 0) {
+								logger.error("Invalid name=value pair=[{0}] in URL=[{1}]: name cannot be empty",
+									nameValueArray, url);
+							}
+							else {
+
+								String[] newValues;
 
 								if (existingValues == null) {
 									newValues = new String[] { nameValueArray[1] };
@@ -89,9 +94,9 @@ public class URLUtil {
 
 								parameterMapValuesArray.put(name, newValues);
 							}
-							else {
-								logger.error("Invalid name=value pair=[{0}] in URL=[{1}]", nameValueArray, url);
-							}
+						}
+						else {
+							logger.error("Invalid name=value pair=[{0}] in URL=[{1}]", nameValueArray, url);
 						}
 					}
 				}

@@ -19,6 +19,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import com.liferay.faces.util.component.ClientComponent;
 import com.liferay.faces.util.render.RendererUtil;
 
 
@@ -125,6 +126,16 @@ public abstract class AlloyRendererBase extends ClientComponentRendererBase impl
 	@Override
 	public String escapeClientId(String clientId) {
 		return AlloyRendererCommon.escapeClientId(clientId);
+	}
+
+	@Override
+	public String escapeJavaScript(String javaScript) {
+		return AlloyRendererCommon.escapeJavaScript(javaScript);
+	}
+
+	@Override
+	public String getClientVarName(FacesContext facesContext, ClientComponent clientComponent) {
+		return AlloyRendererCommon.getClientVarName(facesContext, clientComponent);
 	}
 
 	@Override

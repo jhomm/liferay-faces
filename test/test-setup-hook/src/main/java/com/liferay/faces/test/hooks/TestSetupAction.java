@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -121,6 +120,16 @@ public class TestSetupAction extends TestSetupCompatAction {
 		}
 	}
 
+	protected void setupLSVIssuesSite(long companyId, long userId) throws Exception {
+		Group site = getSiteForSetup(companyId, userId, "LSV Issues");
+		long groupId = site.getGroupId();
+		addAllUsersToSite(companyId, groupId);
+
+		for (PortalPage portalPage : TestPages.LSV_ISSUE_PAGES) {
+			setupPublicPage(companyId, userId, groupId, portalPage);
+		}
+	}
+
 	protected void setupBridgeTCKSite(long companyId, long userId) throws Exception, DocumentException {
 		Group site = getSiteForSetup(companyId, userId, "Bridge TCK");
 		long groupId = site.getGroupId();
@@ -140,7 +149,7 @@ public class TestSetupAction extends TestSetupCompatAction {
 			nameAttribute = portletElement.attribute("name");
 
 			String portletName = nameAttribute.getValue();
-			String liferayPortletName = portletName.replaceAll(StringPool.DASH, StringPool.BLANK);
+			String liferayPortletName = portletName.replaceAll("-", "");
 			String liferayPortletId = liferayPortletName + "_WAR_bridgetckmainportlet";
 			PortalPage portalPage = new PortalPage(pageName, liferayPortletId);
 			setupPrivatePage(companyId, userId, groupId, portalPage);
@@ -243,6 +252,7 @@ public class TestSetupAction extends TestSetupCompatAction {
 	protected void setupSites(long companyId, long userId) throws Exception, DocumentException {
 		setupBridgeDemosSite(companyId, userId);
 		setupBridgeIssuesSite(companyId, userId);
+		setupLSVIssuesSite(companyId, userId);
 		setupPortalDemosSite(companyId, userId);
 		setupPortalIssuesSite(companyId, userId);
 		setupBridgeTCKSite(companyId, userId);

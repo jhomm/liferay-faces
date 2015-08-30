@@ -38,7 +38,7 @@ use POSIX qw(strftime);
 #
 my($liferayFacesVersion,$liferayFacesVersionShort,$liferayFacesVersionShortMajor1DotMajor2,$major1,$major2,$minor);
 my($portalVersion,$portalVersions,$portalDtdDisplay,$portalDtdUrl,$liferayFacesVersionWithoutSnapshot);
-my($facesVersion,$facesVersionURL,$facesMajor,$facesMinor);
+my($facesVersion,$facesVersionURL,$facesMajor,$facesMinor,$servletApi,$servletApiURL,$servletApiMajor1DotMajor2);
 my($liferayFacesMajor1,$liferayFacesMajor2,$liferayFacesMinor,);
 my $year= strftime "%Y", localtime;
 
@@ -106,6 +106,24 @@ while(<POM>) {
 
 	}
 
+	if(/servlet-api<\/artifactId>/) {
+
+			$_ = <POM>;
+			if (/version>(.*)</) {
+			$servletApi = $1;
+			print "servletApi = $servletApi\n";
+
+			$_ = $servletApi;
+			($major1,$major2,$minor) = split /\./;
+
+			$servletApiURL = "${major1}_${major2}";
+			print "servletApiURL = $servletApiURL\n";
+
+			$servletApiMajor1DotMajor2 = "${major1}.${major2}";
+			print "servletApiMajor1DotMajor2 = $servletApiMajor1DotMajor2\n";
+		}
+	}
+
 }
 close POM;
 
@@ -142,6 +160,38 @@ sub do_inplace_edits {
 	}
 
 	#
+	# If the current file is named "web.xml", then potentially fix the
+	# version number specified in the schemaLocation url.
+	#
+	elsif ((($file eq "web.xml") or ($file =~ m/web[-].*\.xml/)) and ($File::Find::name =~ /\/src/)) {
+		print "$File::Find::name\n";
+		$_ = $File::Find::name;
+
+		if (/jsf2-cdi/ and $facesMajor eq "2" and $facesMinor eq "1") {
+			print "intentionally skipping $File::Find::name with faces version $facesVersion\n";
+		} else {
+			open OUT, ">web.xml.tmp" or die "cannot open >web.xml.tmp: $!\n";
+			open IN, $file or die "cannot open $file: $!\n";
+			while(<IN>) {
+				if (/web-app_/) {
+					s/web-app_\d+_\d+.xsd/web-app_${servletApiURL}.xsd/;
+					if (/version="/) {
+						s/version="\d+.\d+"/version="${servletApiMajor1DotMajor2}"/;
+					} else {
+						print OUT;
+						$_ = <IN>;
+						s/version="\d+.\d+"/version="${servletApiMajor1DotMajor2}"/;
+					}
+				}
+				print OUT;
+			}
+			close IN;
+			close OUT;
+			rename("web.xml.tmp", $file);
+		}
+	}
+
+	#
 	# Otherwise, if the current file is named "liferay-portlet.xml" then potentially fix the version
 	# numbers specified in DOCTYPE line for the DTD.
 	#
@@ -159,6 +209,16 @@ sub do_inplace_edits {
 		print "$File::Find::name\n";
 		`perl -pi -e 's/DTD Display ..*\\/\\/EN/DTD Display $portalDtdDisplay\\/\\/EN/' $file`;
 		`perl -pi -e 's/-display_..*\\.dtd/-display_$portalDtdUrl\\.dtd/' $file`;
+	}
+
+	#
+	# Otherwise, if the current file is named "liferay-hook.xml" then potentially fix the version
+	# numbers specified in DOCTYPE line for the DTD.
+	#
+	elsif ($file eq "liferay-hook.xml" and ($File::Find::name =~ /\/src/)) {
+		print "$File::Find::name\n";
+		`perl -pi -e 's/DTD Hook ..*\\/\\/EN/DTD Hook $portalDtdDisplay\\/\\/EN/' $file`;
+		`perl -pi -e 's/-hook_..*\\.dtd/-hook_$portalDtdUrl\\.dtd/' $file`;
 	}
 
 	#

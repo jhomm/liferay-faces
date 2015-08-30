@@ -13,8 +13,6 @@
  */
 package com.liferay.faces.demos.context;
 
-import javax.faces.FacesException;
-
 import com.liferay.faces.util.context.MessageContext;
 import com.liferay.faces.util.context.MessageContextFactory;
 
@@ -35,7 +33,7 @@ public class ShowcaseMessageContextFactory extends MessageContextFactory {
 	}
 
 	@Override
-	public MessageContext getMessageContext() throws FacesException {
+	public MessageContext getMessageContext() {
 		return messageContext;
 	}
 

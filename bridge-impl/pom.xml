@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.liferay.faces</groupId>
 		<artifactId>liferay-faces</artifactId>
-		<version>4.2.5-rc1-SNAPSHOT</version>
+		<version>4.2.6-ga7-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>liferay-faces-bridge-impl</artifactId>
@@ -73,11 +74,11 @@
 		<profile>
 			<id>generate-components</id>
 			<properties>
-				<namespace>bridge</namespace>
+				<component.namespace>bridge</component.namespace>
 				<!-- To generate portlet components, run:
-					mvn generate-source -P generate-components -Dnamespace=portlet -Dnamespace.URI=http://java.sun.com/portlet_2_0
+					mvn generate-sources -P generate-components -Dcomponent.namespace=portlet -Dcomponent.namespace.URI=http://java.sun.com/portlet_2_0
 				-->
-				<component.api.output.dir>../bridge-api/${component.impl.output.dir}</component.api.output.dir>
+				<component.api.output.dir>../bridge-api/src/main/java</component.api.output.dir>
 			</properties>
 		</profile>
 	</profiles>

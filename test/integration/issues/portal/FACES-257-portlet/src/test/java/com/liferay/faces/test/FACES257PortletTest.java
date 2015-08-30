@@ -12,6 +12,7 @@
  * details.
  */
 package com.liferay.faces.test;
+//J-
 
 import static org.junit.Assert.assertTrue;
 
@@ -31,7 +32,7 @@ import com.liferay.faces.test.util.TesterBase;
 
 
 /**
- * @author  Liferay Faces Team
+ * @author	Liferay Faces Team
  */
 @RunWith(Arquillian.class)
 public class FACES257PortletTest extends TesterBase {
@@ -97,7 +98,7 @@ public class FACES257PortletTest extends TesterBase {
 	private WebElement gamma;
 	@FindBy(xpath = requestedUrlXpath)
 	private WebElement requestedUrl;
-	
+
 	@Drone
 	WebDriver browser;
 
@@ -246,3 +247,4 @@ public class FACES257PortletTest extends TesterBase {
 	}
 
 }
+//J+

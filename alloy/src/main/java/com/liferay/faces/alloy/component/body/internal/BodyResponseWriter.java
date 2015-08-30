@@ -14,15 +14,16 @@
 package com.liferay.faces.alloy.component.body.internal;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.ResponseWriter;
 
-import com.liferay.faces.util.client.ClientScript;
-import com.liferay.faces.util.client.ClientScriptFactory;
-import com.liferay.faces.util.factory.FactoryExtensionFinder;
-import com.liferay.faces.util.lang.StringPool;
-import com.liferay.faces.util.render.ContentTypes;
+import com.liferay.faces.alloy.render.internal.AlloyRendererUtil;
+import com.liferay.faces.util.ContentTypes;
+import com.liferay.faces.util.client.BrowserSniffer;
+import com.liferay.faces.util.client.Script;
+import com.liferay.faces.util.context.FacesRequestContext;
 import com.liferay.faces.util.render.internal.DelegationResponseWriterBase;
 
 
@@ -32,24 +33,28 @@ import com.liferay.faces.util.render.internal.DelegationResponseWriterBase;
 public class BodyResponseWriter extends DelegationResponseWriterBase {
 
 	// Private Data Members
+	private boolean ajaxRequest;
 	private UIComponent uiComponent;
+	private BrowserSniffer browserSniffer;
 
-	public BodyResponseWriter(ResponseWriter responseWriter) {
+	public BodyResponseWriter(ResponseWriter responseWriter, BrowserSniffer browserSniffer, boolean ajaxRequest) {
 		super(responseWriter);
+		this.browserSniffer = browserSniffer;
+		this.ajaxRequest = ajaxRequest;
 	}
 
 	@Override
 	public void endElement(String name) throws IOException {
 
-		if (StringPool.BODY.equals(name)) {
-			super.startElement(StringPool.SCRIPT, uiComponent);
-			super.writeAttribute(StringPool.TYPE, ContentTypes.TEXT_JAVASCRIPT, null);
+		if ("body".equals(name) && !ajaxRequest) {
 
-			ClientScriptFactory clientScriptFactory = (ClientScriptFactory) FactoryExtensionFinder.getFactory(
-					ClientScriptFactory.class);
-			ClientScript clientScript = clientScriptFactory.getClientScript();
-			super.write(clientScript.toString());
-			super.endElement(StringPool.SCRIPT);
+			super.startElement("script", uiComponent);
+			super.writeAttribute("type", ContentTypes.TEXT_JAVASCRIPT, null);
+
+			FacesRequestContext facesRequestContext = FacesRequestContext.getCurrentInstance();
+			List<Script> scripts = facesRequestContext.getScripts();
+			AlloyRendererUtil.writeScripts(this, scripts, browserSniffer);
+			super.endElement("script");
 		}
 
 		super.endElement(name);

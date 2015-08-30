@@ -25,7 +25,6 @@ import com.liferay.faces.bridge.context.BridgeContext;
 import com.liferay.faces.bridge.context.BridgeContextMockImpl;
 import com.liferay.faces.bridge.context.url.internal.BridgeURIImpl;
 import com.liferay.faces.portlet.PortletRequestMockImpl;
-import com.liferay.faces.util.lang.StringPool;
 
 import junit.framework.Assert;
 
@@ -120,9 +119,8 @@ public class BridgeURLTest {
 
 		try {
 			newBridgeURI("http://www.liferay.com");
-			Assert.assertTrue(newBridgeURI("http://www.liferay.com").getContextRelativePath(StringPool.BLANK) == null);
-			Assert.assertTrue(newBridgeURI("/views/foo.xhtml").getContextRelativePath(StringPool.BLANK).equals(
-					"/views/foo.xhtml"));
+			Assert.assertTrue(newBridgeURI("http://www.liferay.com").getContextRelativePath("") == null);
+			Assert.assertTrue(newBridgeURI("/views/foo.xhtml").getContextRelativePath("").equals("/views/foo.xhtml"));
 			Assert.assertTrue(newBridgeURI(CONTEXT_PATH + "/views/foo.xhtml").getContextRelativePath(CONTEXT_PATH)
 				.equals("/views/foo.xhtml"));
 		}

@@ -13,8 +13,8 @@
  */
 package com.liferay.faces.util.client.internal;
 
-import javax.faces.FacesException;
 import javax.faces.context.ExternalContext;
+import javax.servlet.http.HttpServletRequest;
 
 import com.liferay.faces.util.client.BrowserSniffer;
 import com.liferay.faces.util.client.BrowserSnifferFactory;
@@ -26,8 +26,11 @@ import com.liferay.faces.util.client.BrowserSnifferFactory;
 public class BrowserSnifferFactoryImpl extends BrowserSnifferFactory {
 
 	@Override
-	public BrowserSniffer getBrowserSniffer(ExternalContext externalContext) throws FacesException {
-		return new BrowserSnifferImpl(externalContext);
+	public BrowserSniffer getBrowserSniffer(ExternalContext externalContext) {
+
+		HttpServletRequest httpServletRequest = (HttpServletRequest) externalContext.getRequest();
+
+		return new BrowserSnifferImpl(httpServletRequest);
 	}
 
 	@Override

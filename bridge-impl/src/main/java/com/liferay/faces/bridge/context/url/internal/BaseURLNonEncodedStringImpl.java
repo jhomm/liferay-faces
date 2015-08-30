@@ -24,8 +24,6 @@ import javax.portlet.BaseURL;
 import javax.portlet.PortletSecurityException;
 import javax.portlet.faces.Bridge;
 
-import com.liferay.faces.bridge.internal.BridgeConstants;
-import com.liferay.faces.util.lang.StringPool;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 
@@ -68,22 +66,24 @@ public class BaseURLNonEncodedStringImpl implements BaseURL {
 		if (toStringValue == null) {
 
 			StringBuilder buf = new StringBuilder();
-			int queryPos = url.indexOf(StringPool.QUESTION);
 
-			if (queryPos >= 0) {
+			if ((parameterMap != null) && !parameterMap.isEmpty()) {
 
-				if (parameterMap == null) {
-					buf.append(url);
+				String urlWithoutParams = url;
+				int queryPos = url.indexOf("?");
+
+				if (queryPos >= 0) {
+					urlWithoutParams = url.substring(0, queryPos);
 				}
-				else {
-					buf.append(url.substring(0, queryPos));
 
-					String queryString = getQuery();
+				buf.append(urlWithoutParams);
 
-					if (queryString.length() > 0) {
-						buf.append(StringPool.QUESTION);
-						buf.append(queryString);
-					}
+				String queryString = getQuery();
+
+				if (queryString.length() > 0) {
+
+					buf.append("?");
+					buf.append(queryString);
 				}
 			}
 			else {
@@ -136,15 +136,15 @@ public class BaseURLNonEncodedStringImpl implements BaseURL {
 			StringBuilder buf = new StringBuilder();
 
 			// Get the original query-string from the URL.
-			String originalQuery = StringPool.BLANK;
+			String originalQuery = "";
 			boolean firstParam = true;
-			int pos = url.indexOf(StringPool.QUESTION);
+			int pos = url.indexOf("?");
 
 			if (pos >= 0) {
 				originalQuery = url.substring(pos + 1);
 			}
 
-			pos = originalQuery.indexOf(StringPool.POUND);
+			pos = originalQuery.indexOf("#");
 
 			String fragmentId = null;
 
@@ -159,7 +159,7 @@ public class BaseURLNonEncodedStringImpl implements BaseURL {
 			// The TCK expects query parameters to appear in exactly the same order as they do in the query-string of
 			// the original URL. For this reason, need to iterate over the parameters found in the original
 			// query-string.
-			String[] queryParameters = originalQuery.split(BridgeConstants.REGEX_AMPERSAND_DELIMITER);
+			String[] queryParameters = originalQuery.split("[&]");
 
 			// For each parameter found in the original query-string:
 			for (String queryParameter : queryParameters) {
@@ -173,11 +173,13 @@ public class BaseURLNonEncodedStringImpl implements BaseURL {
 					String[] values = null;
 
 					if (nameValueArray.length == 1) {
-						name = nameValueArray[0];
-						values = new String[] { StringPool.BLANK };
+
+						name = nameValueArray[0].trim();
+						values = new String[] { "" };
 					}
 					else if (nameValueArray.length == 2) {
-						name = nameValueArray[0];
+
+						name = nameValueArray[0].trim();
 
 						// If the parameter name is present in the parameter map, then that means it should be appended
 						// to the return value. Otherwise, it should not be appended, because absence from the parameter
@@ -185,17 +187,29 @@ public class BaseURLNonEncodedStringImpl implements BaseURL {
 						values = parameterMap.get(name);
 					}
 
-					if ((name != null) && (values != null) && (values.length > 0)) {
+					if ((name == null) || (name.length() == 0)) {
+						logger.error("Invalid name=value pair=[{0}] in URL=[{1}]: name cannot be empty", queryParameter,
+							url);
+					}
+					else if ((values == null) || (values.length == 0)) {
+
+						// Note that "javax.portlet.faces.BackLink" is sometimes deliberately removed and therefore is
+						// not an error.
+						if (!Bridge.BACK_LINK.equals(name)) {
+							logger.error("Invalid name=value pair=[{0}] in URL=[{1}]", queryParameter, url);
+						}
+					}
+					else {
 
 						if (firstParam) {
 							firstParam = false;
 						}
 						else {
-							buf.append(StringPool.AMPERSAND);
+							buf.append("&");
 						}
 
 						buf.append(name);
-						buf.append(StringPool.EQUAL);
+						buf.append("=");
 
 						Integer parameterOccurrences = parameterOccurrenceMap.get(name);
 
@@ -207,16 +221,6 @@ public class BaseURLNonEncodedStringImpl implements BaseURL {
 						buf.append(value);
 						parameterOccurrences = new Integer(parameterOccurrences.intValue() + 1);
 						parameterOccurrenceMap.put(name, parameterOccurrences);
-					}
-
-					// Otherwise, log an error.
-					else {
-
-						// Note that "javax.portlet.faces.BackLink" is sometimes deliberately removed and therefore is
-						// not an error.
-						if (!Bridge.BACK_LINK.equals(name)) {
-							logger.error("Invalid name=value pair=[{0}] in URL=[{1}]", queryParameter, url);
-						}
 					}
 				}
 			}
@@ -238,11 +242,11 @@ public class BaseURLNonEncodedStringImpl implements BaseURL {
 							firstParam = false;
 						}
 						else {
-							buf.append(StringPool.AMPERSAND);
+							buf.append("&");
 						}
 
 						buf.append(name);
-						buf.append(StringPool.EQUAL);
+						buf.append("=");
 						buf.append(values[0]);
 					}
 				}
